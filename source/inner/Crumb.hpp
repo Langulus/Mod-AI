@@ -8,94 +8,63 @@
 #pragma once
 #include "Idea.hpp"
 
+struct Crumb;
+using Crumbs = TMany<const Crumb*>;
+using Rating = Real;
+
 
 ///                                                                           
-///   Pattern crumb                                                           
+///   Part of a Pattern                                                       
 ///                                                                           
-/// A pattern crumb is a distinguishable part of, or a whole pattern          
-///                                                                           
-struct Crumb {
+struct Crumb : Referenced {
 protected:
-   friend class Mind;
+   friend struct Mind;
 
-   // ID of the crumb                                                   
-   Idea::Id mID = 0;
-   // Start of pattern in raw memory                                    
-   Offset mDataStart = 0;
-   // End of pattern in raw memory                                      
-   Offset mDataEnd = 0;
    // Usage and relevance ratings                                       
-   Real mRating = 0;
+   Rating mRating = 0;
+   // The data of the crumb                                             
+   Bytes  mData;
 
    // The crumbs that precede this one (hypergraph if more than one)    
-   Ideas mParents;
+   Crumbs mParents;
    // The crumbs that follow this one                                   
-   Ideas mChildren;
-
-   // The biggest pattern, starting from this crumb towards children    
-   // This gives an approximation to how much stuff any crumb leads     
-   // The shortest path is GetLength() of the crumb                     
-   Count mLongestPath = 0;
+   Crumbs mChildren;
 
    // Associations                                                      
    // Facilitates pattern connections, synonimity and equivalence       
-   Ideas mAssociations;
+   Crumbs mAssociations;
    // Disassociations                                                   
    // Facilitates inhibitory connections and suppresses equivalence.    
-   Ideas mDisassociations;
+   Crumbs mDisassociations;
 
 public:
-   Crumb(const Idea::Id& id, const Idea::Id & parent, Real rating, Offset pstart, Offset pend);
+   Crumb(const Crumb*, Rating, const Bytes&);
    Crumb(const Crumb&) = default;
    Crumb(Crumb&&) noexcept = default;
 
-   bool operator == (const Crumb& other) const noexcept {
-      return mID == other.mID;
-   }
-   bool operator > (const Crumb& other) const noexcept {
-      return mRating > other.mRating;
-   }
-   bool operator < (const Crumb& other) const noexcept {
-      return mRating < other.mRating;
-   }
+   bool operator >  (const Crumb&) const noexcept;
+   bool operator <  (const Crumb&) const noexcept;
 
-   NOD() bool IsValid() const noexcept {
-      return mDataEnd > mDataStart;
-   }
-   NOD() bool IsOrphan() const noexcept {
-      return mParents.IsEmpty() or not mID;
-   }
-   NOD() bool IsStump() const noexcept {
-      return mChildren.IsEmpty();
-   }
-   NOD() auto GetLength() const noexcept {
-      return mDataEnd - mDataStart;
-   }
-   NOD() const auto& GetAssociations() const noexcept {
-      return mAssociations;
-   }
+   NOD() bool IsOrphan() const noexcept;
+   NOD() bool IsStump() const noexcept;
+   NOD() auto GetData() const noexcept -> const Bytes&;
+   NOD() auto GetAssociations() const noexcept -> const Crumbs&;
 
-   void ResetParents          (Mind*);
-   void ResetChildren         (Mind*);
-   void RecalculateLongestPath(Mind*);
+   void ResetParents       ();
+   void ResetChildren      ();
 
-   void SetParents            (Mind*, const Ideas&);
-   void SetChildren           (Mind*, const Ideas&);
-   bool HasChild              (const Idea::Id&) const;
-   bool HasParent             (const Idea::Id&) const;
-   bool HasAssociation        (const Idea::Id&) const;
-   bool HasDisassociation     (const Idea::Id&) const;
+   void SetParents         (const Crumbs&);
+   void SetChildren        (const Crumbs&);
+   bool HasChild           (const Crumb*) const;
+   bool HasParent          (const Crumb*) const;
+   bool HasAssociation     (const Crumb*) const;
+   bool HasDisassociation  (const Crumb*) const;
 
-   Idea::Id Build(Mind*, const Bytes&, Offset progress, Offset end, bool& newlyBuilt);
-   Idea::Id Seek (Mind*, const Bytes&, Offset progress, Offset end);
-
-   void AddParent          (Mind*, const Idea::Id&);
-   void RemoveParent       (Mind*, const Idea::Id&);
-   void AddChild           (Mind*, const Idea::Id&);
-   void RemoveChild        (Mind*, const Idea::Id&);
-   void Associate          (const Idea::Id&);
-   void Disassociate       (const Idea::Id&);
+   void AddParent          (const Crumb*);
+   void RemoveParent       (const Crumb*);
+   void AddChild           (const Crumb*);
+   void RemoveChild        (const Crumb*);
+   void Associate          (const Crumb*);
+   void Disassociate       (const Crumb*);
 
 };
-
-using Crumbs = TMany<Crumb>;

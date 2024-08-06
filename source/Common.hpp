@@ -12,6 +12,7 @@
 #include <Langulus/AI.hpp>
 
 using namespace Langulus;
+using namespace Anyness;
 using Temporal = Flow::Temporal;
 
 struct AI;

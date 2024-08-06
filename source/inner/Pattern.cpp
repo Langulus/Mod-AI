@@ -5,6 +5,7 @@
 ///                                                                           
 /// SPDX-License-Identifier: GPL-3.0-or-later                                 
 ///                                                                           
+#include "Pattern.hpp"
 #include "../Mind.hpp"
 #include "../AI.hpp"
 
@@ -19,23 +20,11 @@
 ///   @param data - the data of the pattern                                   
 ///   @param writable - whether or not the pattern is writable                
 ///   @param depth - the depth of the pattern                                 
-Pattern::Pattern(Mind* decoder, const Block& data, bool writable, pcptr depth)
+Pattern::Pattern(Mind* decoder, const Many& data, bool writable, pcptr depth)
    : mDecoder {decoder}
    , mData {data}
    , mDepth {depth}
    , mWritePermitted {writable} {}
-
-/// Clone the pattern                                                         
-///   @return the cloned pattern                                              
-Pattern Pattern::Clone() const {
-   Pattern result {mDecoder, mData.Clone(), mWritePermitted, mDepth};
-   result.mSubpatterns = mSubpatterns.Clone();
-   result.mDataSerialized = mDataSerialized.Clone();
-   result.mIdea = mIdea;
-   result.mResolved = mResolved.Clone();
-   result.mScannedCount = mScannedCount;
-   return result;
-}
 
 constexpr pcptr InfiniteDepth = std::numeric_limits<pcptr>::max();
 
@@ -45,17 +34,17 @@ constexpr pcptr InfiniteDepth = std::numeric_limits<pcptr>::max();
 /// a result - it is your responsibility to cull the stuff you don't need     
 ///   @param verb - the interpretation verb                                   
 void Pattern::Interpret(Verb& verb) {
-   Any result;
+   Many result;
    auto depth = InfiniteDepth;
 
    const auto inner = [&](DMeta meta) {
-      if (meta->Is<GASM>() || meta->Is<Debug>()) {
+      if (meta->Is<GASM>() or meta->Is<Debug>()) {
          // Use reflected operators instead										
          return;
       }
 
       PATTERN_INTERPRET_VERBOSE_TAB("Interpreting to " << meta);
-      Any output;
+      Many output;
       auto localDepth = Interpret(meta, depth, output);
       if (!output.IsEmpty()) {
          if (localDepth >= depth) {
@@ -103,15 +92,15 @@ void Pattern::Interpret(Verb& verb) {
    );
 
    // Output results if any															
-   if (!result.IsEmpty())
-      verb << pcMove(result);
+   if (not result.IsEmpty())
+      verb << Move(result);
 }
 
 /// Inner, nested pattern compilation														
 ///	@param filter - the type we're filtering against								
 ///	@param relevantSolutions - [out] the filtered results							
 ///	@return the depth at which relevantSolutions were gathered					
-pcptr Pattern::InnerInterpret(DMeta filter, Any& relevantSolutions) const {
+pcptr Pattern::InnerInterpret(DMeta filter, Many& relevantSolutions) const {
    // Filter out relevant resolved and pattern data							
    auto depth = Gather(filter, relevantSolutions);
    if (mSubpatterns.IsEmpty())

@@ -50,4 +50,5 @@ public:
 /// Useful containers                                                         
 constexpr Idea BadIdea = Idea {};
 using Ids = TMany<Idea::Id>;
+//using Ideas = TMany<Idea>;
 using	WeightedIdeas = TMany<WeightedIdea>;
