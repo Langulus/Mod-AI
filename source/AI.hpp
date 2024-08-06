@@ -9,15 +9,14 @@
 #include "Society.hpp"
 #include "Mind.hpp"
 #include <Flow/Verbs/Create.hpp>
-#include <Flow/Factory.hpp>
 
 
 ///                                                                           
 ///   AI module, producer of minds and societies                              
 ///                                                                           
-struct AI final : A::Module {
+struct AI final : A::AIModule {
    LANGULUS(ABSTRACT) false;
-   LANGULUS_BASES(A::Module);
+   LANGULUS_BASES(A::AIModule);
    LANGULUS_VERBS(Verbs::Create);
 
 private:

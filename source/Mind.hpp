@@ -17,10 +17,10 @@
 /// Gives the capability to associate complex notions and to record events    
 /// that are happening to a Thing with this component.                        
 ///                                                                           
-struct Mind final : A::Unit, ProducedFrom<AI> {
+struct Mind final : A::Mind, ProducedFrom<AI> {
    LANGULUS(ABSTRACT) false;
    LANGULUS(PRODUCER) AI;
-   LANGULUS_BASES(A::Unit);
+   LANGULUS_BASES(A::Mind);
    LANGULUS_VERBS(Verbs::Do);
 
 private:

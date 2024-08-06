@@ -16,10 +16,10 @@
 /// Societies emerge when minds have a lot of shared knowledge.               
 /// Roles emerge when minds start specializing and dividing labor.            
 ///                                                                           
-struct Society final : A::Unit, ProducedFrom<AI> {
+struct Society final : A::AIUnit, ProducedFrom<AI> {
    LANGULUS(ABSTRACT) false;
    LANGULUS(PRODUCER) AI;
-   LANGULUS_BASES(A::Unit);
+   LANGULUS_BASES(A::AIUnit);
 
 private:
    // Shared history                                                    

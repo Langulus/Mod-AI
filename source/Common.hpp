@@ -8,6 +8,8 @@
 #pragma once
 #include <Langulus.hpp>
 #include <Flow/Temporal.hpp>
+#include <Flow/Factory.hpp>
+#include <Langulus/AI.hpp>
 
 using namespace Langulus;
 using Temporal = Flow::Temporal;

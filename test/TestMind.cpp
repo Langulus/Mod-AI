@@ -6,6 +6,7 @@
 /// SPDX-License-Identifier: GPL-3.0-or-later                                 
 ///                                                                           
 #include "Main.hpp"
+#include <Langulus/AI.hpp>
 #include <catch2/catch.hpp>
 
 
@@ -15,51 +16,41 @@ CATCH_TRANSLATE_EXCEPTION(::Langulus::Exception const& ex) {
    return ::std::string {Token {serialized}};
 }
 
-SCENARIO("Input handler creation", "[input]") {
+SCENARIO("Mind creation", "[ai]") {
    static Allocator::State memoryState;
    
    for (int repeat = 0; repeat != 10; ++repeat) {
       GIVEN(std::string("Init and shutdown cycle #") + std::to_string(repeat)) {
          // Create root entity                                          
-         auto root = Thing::Root<false>("InputSDL");
+         auto root = Thing::Root<false>("AI");
 
-         WHEN("The input gatherer is created via abstractions") {
-            auto gatherer = root.CreateUnit<A::InputGatherer>();
-            auto listener = root.CreateUnit<A::InputListener>();
+         WHEN("The mind is created via abstraction") {
+            auto mind = root.CreateUnit<A::Mind>();
 
             // Update once                                              
             root.Update(Time::zero());
             root.DumpHierarchy();
 
-            REQUIRE(gatherer.GetCount() == 1);
-            REQUIRE(gatherer.CastsTo<A::InputGatherer>(1));
-            REQUIRE(gatherer.IsSparse());
+            REQUIRE(mind.GetCount() == 1);
+            REQUIRE(mind.CastsTo<A::Mind>(1));
+            REQUIRE(mind.IsSparse());
 
-            REQUIRE(listener.GetCount() == 1);
-            REQUIRE(listener.CastsTo<A::InputListener>(1));
-            REQUIRE(listener.IsSparse());
-
-            REQUIRE(root.GetUnits().GetCount() == 2);
+            REQUIRE(root.GetUnits().GetCount() == 1);
          }
 
       #if LANGULUS_FEATURE(MANAGED_REFLECTION)
-         WHEN("The input gatherer is created via tokens") {
-            auto gatherer = root.CreateUnitToken("InputGatherer");
-            auto listener = root.CreateUnitToken("InputListener");
+         WHEN("The mind is created via token") {
+            auto mind = root.CreateUnitToken("Mind");
 
             // Update once                                              
             root.Update(Time::zero());
             root.DumpHierarchy();
 
-            REQUIRE(gatherer.GetCount() == 1);
-            REQUIRE(gatherer.CastsTo<A::InputGatherer>(1));
-            REQUIRE(gatherer.IsSparse());
+            REQUIRE(mind.GetCount() == 1);
+            REQUIRE(mind.CastsTo<A::Mind>(1));
+            REQUIRE(mind.IsSparse());
 
-            REQUIRE(listener.GetCount() == 1);
-            REQUIRE(listener.CastsTo<A::InputListener>(1));
-            REQUIRE(listener.IsSparse());
-
-            REQUIRE(root.GetUnits().GetCount() == 2);
+            REQUIRE(root.GetUnits().GetCount() == 1);
          }
       #endif
 
