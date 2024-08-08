@@ -15,14 +15,14 @@ private:
 public:
    Ontology(Describe&&);
 
-   NOD() const Idea* Build(const Bytes&, bool& newlyBuilt);
-   NOD() const Idea* Seek(const Bytes&);
-   NOD() const Idea* Represent(const Many&);
+   NOD() auto Build(const Bytes&, bool& newlyBuilt) -> const Idea*;
+   NOD() auto Seek(const Bytes&) -> const Idea*;
+   NOD() auto Represent(const Many&) -> const Idea*;
 
    void Associate(bool invert, const Many&, const Many&);
    void AssociateIdeas(bool invert, const Idea*, const Idea*);
-   NOD() Many Deserialize(const Idea*) const;
+   NOD() auto Deserialize(const Idea*) const -> Many;
 
-   auto CreateCrumb(Rating, const Bytes&) -> Idea*;
-   void DeleteCrumb(Idea*);
+   auto CreateIdea(Rating, const Bytes&) -> Idea*;
+   void DeleteIdea(Idea*);
 };

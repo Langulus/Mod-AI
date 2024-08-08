@@ -12,7 +12,7 @@ Ontology::Ontology(Describe&&) {
 ///   @param pattern - the pattern to build                                   
 ///   @param newlyBuilt - [out] for debugging only                            
 ///   @return the built idea                                                  
-const Crumb* Ontology::Build(const Bytes& pattern, bool& newlyBuilt) {
+auto Ontology::Build(const Bytes& pattern, bool& newlyBuilt) -> const Idea* {
    for (auto& crumb : mCrumbs) {
       if (not crumb.IsOrphan())
          continue;
@@ -27,7 +27,7 @@ const Crumb* Ontology::Build(const Bytes& pattern, bool& newlyBuilt) {
    }
 
    // Pattern wasn't built as a child, so do it as an orphan            
-   const auto addition = CreateCrumb(1, pattern);
+   const auto addition = CreateIdea(1, pattern);
    VERBOSE_AI_BUILD(Logger::Green, "Built pattern ", pattern);
    newlyBuilt = true;
    return addition;
@@ -36,7 +36,7 @@ const Crumb* Ontology::Build(const Bytes& pattern, bool& newlyBuilt) {
 /// Recall cached pattern                                                     
 ///   @param pattern - the pattern to search for                              
 ///   @return the found idea, or nullptr if not found                         
-const Crumb* Ontology::Seek(const Bytes& pattern) {
+auto Ontology::Seek(const Bytes& pattern) -> const Idea* {
    for (auto& crumb : mCrumbs) {
       if (not crumb.IsOrphan())
          continue;
@@ -52,36 +52,36 @@ const Crumb* Ontology::Seek(const Bytes& pattern) {
    return nullptr;
 }
 
-/// Produce a new crumb                                                       
+/// Produce a new idea                                                        
 ///   @param rating - crumb's initial rating                                  
 ///   @param pattern - the pattern                                            
 ///   @return the new crumb                                                   
-Crumb* Ontology::CreateCrumb(Real rating, const Bytes& pattern) {
+auto Ontology::CreateIdea(Real rating, const Bytes& pattern) -> Idea* {
    return mCrumbs.New(nullptr, 0, pattern);
 }
 
-/// Delete a crumb                                                            
-///   @param crumb - the crumb to remove                                      
-void Ontology::DeleteCrumb(Crumb* crumb) {
-   LANGULUS_ASSUME(DevAssumes, crumb, "Crumb must be valid");
+/// Delete an idea                                                            
+///   @param idea - the idea to remove                                        
+void Ontology::DeleteIdea(Idea* idea) {
+   LANGULUS_ASSUME(DevAssumes, idea, "Idea must be valid");
 
    // Mark everything under that crumb for deletion                     
    // Crumbs are never deleted at runtime - this is instead batched and 
    // done upon serialization/optimization.                             
-   for (auto& n : crumb->mChildren)
-      DeleteCrumb(n);
+   for (auto& n : idea->mChildren)
+      DeleteIdea(n);
 
-   crumb->mChildren.Reset();
-   crumb->mParents.Reset();
-   crumb->mAssociations.Reset();
-   crumb->mDisassociations.Reset();
-   crumb->mData.Reset();
+   idea->mChildren.Reset();
+   idea->mParents.Reset();
+   idea->mAssociations.Reset();
+   idea->mDisassociations.Reset();
+   idea->mData.Reset();
 }
 
 /// Represent a pattern as an idea                                            
 ///   @param pattern - the pattern to represent                               
 ///   @return the idea representing the pattern                               
-const Crumb* Ontology::Represent(const Many& pattern) {
+auto Ontology::Represent(const Many& pattern) -> const Idea* {
    Pattern result {*this, pattern, true};
 
    // Collect all subpatterns inside the pattern                        
@@ -94,65 +94,68 @@ const Crumb* Ontology::Represent(const Many& pattern) {
 
 /// Associate two patterns                                                    
 ///   @param invert - whether to associate or disassociate                    
-///   @param leftpack - the left pattern                                      
-///   @param rightpack - the right pattern                                    
-void Ontology::Associate(const bool invert, const Many& leftpack, const Many& rightpack) {
-   AssociateIdeas(invert, Represent(leftpack), Represent(rightpack));
+///   @param left - the left pattern                                          
+///   @param right - the right pattern                                        
+void Ontology::Associate(
+   const bool invert, const Many& left, const Many& right
+) {
+   AssociateIdeas(invert, Represent(left), Represent(right));
 }
 
 /// Associate two ideas                                                       
+///   @param invert - whether to associate or disassociate                    
 ///   @param left - the left idea                                             
 ///   @param right - the right idea                                           
-void Ontology::AssociateIdeas(const bool invert, const Idea::Id& left, const Idea::Id& right) {
-   if (left == right) {
-      pcLogFuncVerbose << "Skipping " << (invert ? "disassociation - " : "association - ")
-         << ccPush << ccWhite << left << ccPop << " to itself";
+void Ontology::AssociateIdeas(
+   const bool invert, const Idea* lhs, const Idea* rhs
+) {
+   if (lhs == rhs) {
+      Logger::Verbose(
+         "Skipping ", (invert ? "disassociation - " : "association - "),
+         Logger::PushWhite, lhs, Logger::Pop, " to itself");
       return;
    }
-   else if (not left or not right)
-      throw Except::AI(pcLogFuncError << "Can't associate with bad ideas");
+   else LANGULUS_ASSERT(lhs and rhs, AI, "Can't associate with bad ideas");
 
    if (invert) {
-      GetCrumb(left)->Disassociate(right);
-      GetCrumb(right)->Disassociate(left);
+      lhs->Disassociate(rhs);
+      rhs->Disassociate(lhs);
    }
    else {
-      GetCrumb(left)->Associate(right);
-      GetCrumb(right)->Associate(left);
+      lhs->Associate(rhs);
+      rhs->Associate(lhs);
    }
 
-   pcLogFuncVerbose << (invert ? "Disassociated " : "Associated ")
-      << ccPush << ccWhite << left
-      << ccPop << " with "
-      << ccPush << ccWhite << right;
+   Logger::Verbose(
+      (invert ? "Disassociated " : "Associated "),
+      Logger::PushWhite, lhs, Logger::Pop, " with ", Logger::PushWhite, rhs
+   );
 }
 
 /// Deserialize a crumb, gathering its parents backwards                      
 ///   @param index - the idea to begin with                                   
 ///   @param output - [out] the data gets gathered in this container          
-void Ontology::Deserialize(const Idea::Id index, Many& output) const {
-   ASSEMBLE_VERBOSE(ScopedTab tab; pcLogFuncVerbose
-      << "Assembling " << ccCyan << index << tab);
-
+Many Ontology::Deserialize(const Idea* idea) const {
    // Collect the bytes in all crumbs, starting with index itself...    
-   auto crumb = GetCrumb(index);
-   Bytes serialized;
-   serialized.Insert(mRaw.GetBytes() + crumb->mDataStart, crumb->GetLength());
+   VERBOSE_AI_ASSEMBLE_TAB("Assembling ", Logger::Cyan, idea);
+   Bytes serialized = idea->mData;
 
    // ... and then all parents up to the first orphan                   
-   if (!crumb->mParents.IsEmpty()) {
-      auto parent = GetCrumb(crumb->mParents[0]);
+   if (idea->mParents) {
+      auto parent = idea->mParents[0]; //TODO does it allow for hypergraphs then???
       while (parent) {
-         serialized.Insert(mRaw.GetBytes() + parent->mDataStart, parent->GetLength(), uiFront);
-         if (parent->mParents.IsEmpty())
-            break;
+         serialized >> parent->mData;
 
-         parent = GetCrumb(parent->mParents[0]);
+         if (not parent->mParents)
+            break;
+         parent = parent->mParents[0];
       }
    }
 
    // Deserialize it	into output container                              
-   output = pcDeserialize(serialized);
-   ASSEMBLE_VERBOSE(pcLogVerbose
-      << "Assembled " << ccPush << ccCyan << index << ccPop << " to " << output);
+   Many output;
+   serialized.Deserialize(output);
+   VERBOSE_AI_ASSEMBLE("Assembled ",
+      Logger::PushCyan, idea, Logger::Pop, " to ", output);
+   return Abandon(output);
 }

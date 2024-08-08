@@ -9,24 +9,6 @@
 #include "../Mind.hpp"
 #include "../AI.hpp"
 
-#define PATTERN_INTERPRET_VERBOSE_TAB(...)   const auto scope = Logger::VerboseTab(__VA_ARGS__)
-#define PATTERN_INTERPRET_VERBOSE(...)       Logger::Verbose(__VA_ARGS__)
-
-#define PATTERN_GATHER_VERBOSE_TAB(...)      const auto scope = Logger::VerboseTab(__VA_ARGS__)
-#define PATTERN_GATHER_VERBOSE(...)          Logger::Verbose(__VA_ARGS__)
-
-#define PATTERN_COLLECT_VERBOSE_TAB(...)     const auto scope = Logger::VerboseTab(__VA_ARGS__)
-#define PATTERN_COLLECT_VERBOSE(...)         Logger::Verbose(__VA_ARGS__)
-
-#define PATTERN_BUILD_VERBOSE_TAB(...)       const auto scope = Logger::VerboseTab(__VA_ARGS__)
-#define PATTERN_BUILD_VERBOSE(...)           Logger::Verbose(__VA_ARGS__)
-
-#define PATTERN_RESOLVE_VERBOSE_TAB(...)     const auto scope = Logger::VerboseTab(__VA_ARGS__)
-#define PATTERN_RESOLVE_VERBOSE(...)         Logger::Verbose(__VA_ARGS__)
-
-#define PATTERN_ASSEMBLE_VERBOSE_TAB(...)    const auto scope = Logger::VerboseTab(__VA_ARGS__)
-#define PATTERN_ASSEMBLE_VERBOSE(...)        Logger::Verbose(__VA_ARGS__)
-
 
 namespace
 {
@@ -191,15 +173,14 @@ bool InnerGather(
          if (localOutput) {
             if (depth < limit and not output.IsEmpty()) {
                // Better match was gathered, so reset output            
-               PATTERN_GATHER_VERBOSE(Logger::DarkYellow,
+               VERBOSE_AI_GATHER(Logger::DarkYellow,
                   "Better match found, discarding ", output);
                output.Clear();
             }
 
-            PATTERN_GATHER_VERBOSE(
+            VERBOSE_AI_GATHER(
                "Gathered deep OR scope (at depth ", depth, ") ",
-               localOutput
-            );
+               localOutput);
             output << Move(localOutput);
             limit = depth;
             pushed = true;
@@ -220,13 +201,13 @@ bool InnerGather(
       // The input is compatible with the filter                        
       if (depth < limit and not output.IsEmpty()) {
          // Better match was gathered, so reset output                  
-         PATTERN_GATHER_VERBOSE(Logger::DarkYellow, 
+         VERBOSE_AI_GATHER(Logger::DarkYellow,
             "Better match found, discarding ", output);
          output.Clear();
       }
 
       pushed = output.SmartPush(Many {input});
-      PATTERN_GATHER_VERBOSE("Gathered (at depth ", depth, ") ", input);
+      VERBOSE_AI_GATHER("Gathered (at depth ", depth, ") ", input);
       limit = depth;
       return pushed;
    }
@@ -236,12 +217,12 @@ bool InnerGather(
    if (Flow::DispatchFlat(input, interpreter)) {
       if (depth < limit and not output.IsEmpty()) {
          // Better match was gathered, so reset output                  
-         PATTERN_GATHER_VERBOSE(Logger::DarkYellow,
+         VERBOSE_AI_GATHER(Logger::DarkYellow,
             "Better match found, discarding ", output);
          output.Clear();
       }
 
-      PATTERN_GATHER_VERBOSE(
+      VERBOSE_AI_GATHER(
          "Gathered after interpretation (at depth ", depth, 
          ") from ", input, " to ", interpreter.GetOutput()
       );
@@ -271,7 +252,7 @@ Offset Pattern::Gather(DMeta filter, Many& output) const {
       // The data is compatible with the filter                         
       Many shallowCopy = mData;
       if (output.SmartPush(shallowCopy)) {
-         PATTERN_GATHER_VERBOSE("Gathered (from pattern) ", mData);
+         VERBOSE_AI_GATHER("Gathered (from pattern) ", mData);
          return 0;
       }
    }
@@ -354,7 +335,7 @@ Offset Pattern::Collect() {
 
          if (attempt.mSubpatterns) {
             auto gapPattern = mData.Select(0, mScannedCount);
-            PATTERN_COLLECT_VERBOSE(Logger::Red, "Gap formed: ", gapPattern);
+            VERBOSE_AI_COLLECT(Logger::Red, "Gap formed: ", gapPattern);
             Push(FocusOn(gapPattern));
             Push(Move(attempt));
          }
@@ -387,7 +368,7 @@ Offset Pattern::Collect() {
       // Nest if deep, in order to serialize hierarchy correctly        
       // There is no escape from this scope                             
       Offset gap = 0;
-      PATTERN_COLLECT_VERBOSE_TAB("Analyzing deep ", *this);
+      VERBOSE_AI_COLLECT_TAB("Analyzing deep ", *this);
       mSubpatterns.ToggleState(mData.GetUnconstrainedState());
       mData.ForEach([&](const Many& subData) {
          auto subpattern = FocusOn(subData);
@@ -399,7 +380,7 @@ Offset Pattern::Collect() {
 
    // If this is reached, then pattern is surely flat                   
    // Find the biggest subpattern                                       
-   PATTERN_COLLECT_VERBOSE_TAB("Analyzing flat ", *this);
+   VERBOSE_AI_COLLECT_TAB("Analyzing flat ", *this);
    Offset gap = 0;
    auto biggest = FocusOn({});
    for (Offset size = 1; size <= mData.GetCount(); ++size) {
@@ -440,10 +421,10 @@ Offset Pattern::Collect() {
          // Append the rest (if any) as a tail                          
          auto missing = mData.Select(biggestSize, fullSize - biggestSize);
          Push(FocusOn(missing));
-         PATTERN_COLLECT_VERBOSE(Logger::Red, "Missing: ", missing);
+         VERBOSE_AI_COLLECT(Logger::Red, "Missing: ", missing);
       }
    }
-   else PATTERN_COLLECT_VERBOSE(Logger::Red, "Missing: ", mData);
+   else VERBOSE_AI_COLLECT(Logger::Red, "Missing: ", mData);
 
    ++mScannedCount;
    return ::std::max(gap, fullSize - biggestSize);
@@ -547,7 +528,7 @@ auto Pattern::InnerSeek() -> const Idea* {
 
    if (mIdea) {
       // Found the pattern as-is                                        
-      PATTERN_COLLECT_VERBOSE(Logger::Green, "Found ", *this);
+      VERBOSE_AI_COLLECT(Logger::Green, "Found ", *this);
    }
    else {
       // Attempt isolating the pattern, by surrounding it with noise    
@@ -567,7 +548,7 @@ auto Pattern::InnerSeek() -> const Idea* {
          mIdea = mOntology.Seek(isolatedSerializedData);
 
          if (mIdea) {
-            PATTERN_COLLECT_VERBOSE(Logger::Green,
+            VERBOSE_AI_COLLECT(Logger::Green,
                "Found (after isolating ", isolatedData, " ) ", *this);
          }
       }
@@ -583,7 +564,7 @@ auto Pattern::InnerBuild() -> const Idea* {
    bool newlyBuilt = true;
    mIdea = mOntology.Build(mDataSerialized, newlyBuilt);
    if (mIdea and newlyBuilt)
-      PATTERN_BUILD_VERBOSE(Logger::DarkYellow, "Built ", *this);
+      VERBOSE_AI_BUILD(Logger::DarkYellow, "Built ", *this);
    return mIdea;
 }
 
@@ -601,7 +582,7 @@ void Pattern::Resolve(const Offset limit) {
       return;
 
    // Always push the original pattern first                            
-   PATTERN_RESOLVE_VERBOSE("Resolve - adding original data: ", mData);
+   VERBOSE_AI_RESOLVE("Resolve - adding original data: ", mData);
    mResolved << mData;
 
    if (mSubpatterns) {
@@ -624,7 +605,7 @@ void Pattern::Resolve(const Offset limit) {
       mResolved << Many::Wrap(assembled);
    }
 
-   PATTERN_RESOLVE_VERBOSE_TAB("Resolved to... ");
+   VERBOSE_AI_RESOLVE_TAB("Resolved to... ");
    bool moar = false;
    Offset counter = 0;
    do {
@@ -652,7 +633,7 @@ void Pattern::AssembleData(
    if (input.IsDeep()) {
       // Input has hierarchy and we need to nest it                     
       // There is no escape from this scope                             
-      PATTERN_ASSEMBLE_VERBOSE_TAB("Assembling scope ", input);
+      VERBOSE_AI_ASSEMBLE_TAB("Assembling scope ", input);
       input.ForEach([&](const Many& part) {
          AssembleData(depth, limit, part, local, mask);
       });
@@ -664,7 +645,7 @@ void Pattern::AssembleData(
       // If this is reached, then input is flat                         
       // Assemble each idea, or propagate data                          
       const bool flatten = not input.IsOr() and input.GetCount() > 1;
-      PATTERN_ASSEMBLE_VERBOSE("Assembling ",
+      VERBOSE_AI_ASSEMBLE("Assembling ",
          (flatten ? "(and flattening) " : ""), "idea(s) ", input);
 
       // Deserialize ideas                                              
@@ -731,11 +712,11 @@ void Pattern::AssembleData(
    }
    else if (input) {
       // Directly push data that is already deserialized                
-      PATTERN_ASSEMBLE_VERBOSE("Propagating data: ", input);
+      VERBOSE_AI_ASSEMBLE("Propagating data: ", input);
       output << input;
    }
 
-   PATTERN_ASSEMBLE_VERBOSE("Result: ", Logger::Green, output);
+   VERBOSE_AI_ASSEMBLE("Result: ", Logger::Green, output);
 }
 
 /// Dump a pretty resolved data fractal level                                 
