@@ -17,7 +17,7 @@
 struct Pattern {
 private:
    // Decoder                                                           
-   Ref<Mind*> mSource;
+   Ontology& mOntology;
    // Patterns after collecting                                         
    TMany<Pattern*> mSubpatterns;
    // The original pattern                                              
@@ -29,42 +29,32 @@ private:
    // The serialized pattern segment [mStart; mStart + mCount)          
    Bytes mDataSerialized;
    // The pattern's resulting idea                                      
-   Idea::Id mIdea;
+   const Idea* mIdea;
    // The resolved idea                                                 
-   Many mResolved;
+   Many  mResolved;
    // Number of times the pattern has been scanned                      
    Count mScannedCount = 0;
 
 public:
-   Pattern() = delete;
-   Pattern(Mind*, const Many&, bool writable, Offset depth = 0);
+   Pattern(Ontology&, const Many&, bool writable, Offset depth = 0);
    ~Pattern() = default;
 
-   NOD() pcptr Interpret(DMeta, pcptr limit, Any&);
-   NOD() pcptr InnerInterpret(DMeta, Any&) const;
-   NOD() static bool IntegrateInterpretation(Any&, const Any&);
+   NOD() Offset Interpret(DMeta, Offset limit, Many&);
+   NOD() Offset InnerInterpret(DMeta, Many&) const;
 
-   void Compile(pcptr limit, Temporal&);
+   void Compile(Temporal&);
    void InnerCompile(Temporal&) const;
 
-   void Interpret(Verb&);
+   static bool DumpIdeaFractal(const Many&, Offset target, Offset depth);
 
-   NOD() explicit operator GASM() const;
-   NOD() explicit operator Debug() const;
-
-   static bool DumpIdeaFractal(const Block&, pcptr target, pcptr depth);
-
-   inline bool IsValid() const noexcept {
-      return mIdea or not mSubpatterns.IsEmpty();
-   }
-
-   void Resolve(pcptr);
+   bool IsValid() const noexcept;
+   void Resolve(Offset);
    using IdeaMask = TMap<IdeaID, pcptr>;
-   void AssembleData(pcptr, pcptr, const Any&, Any&, IdeaMask&) const;
-   NOD() pcptr Gather(DMeta, Any&) const;
+   void AssembleData(Offset, Offset, const Many&, Many&, IdeaMask&) const;
 
-   Idea::Id Reduce();
-   NOD() Pattern FocusOn(const Many&) const;
+   NOD() auto Gather(DMeta, Many&) const -> Offset;
+   NOD() auto Reduce() -> const Idea*;
+   NOD() auto FocusOn(const Many&) const -> Pattern;
 
    auto Collect() -> Count;
    void Build();
@@ -72,7 +62,7 @@ public:
    void ReplaceWith(Pattern&&);
 
 private:
-   auto InnerSeek()  -> Idea::Id;
-   auto InnerBuild() -> Idea::Id;
-   void Serialize();
+   auto InnerSeek () -> const Idea*;
+   auto InnerBuild() -> const Idea*;
+   void Serialize ();
 };

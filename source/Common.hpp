@@ -21,10 +21,14 @@ struct Mind;
 
 #if 1
    #define VERBOSE_AI_ENABLED() 1
-   #define VERBOSE_AI(...)      Logger::Info(Self(), __VA_ARGS__)
-   #define VERBOSE_AI_TAB(...)  const auto tab = Logger::InfoTab(Self(), __VA_ARGS__)
+   #define VERBOSE_AI(...)       Logger::Info(Self(), __VA_ARGS__)
+   #define VERBOSE_AI_TAB(...)   const auto tab = Logger::InfoTab(Self(), __VA_ARGS__)
+   #define VERBOSE_AI_SEEK(...)  Logger::Verbose(__VA_ARGS__)
+   #define VERBOSE_AI_BUILD(...) Logger::Verbose(__VA_ARGS__)
 #else
    #define VERBOSE_AI_ENABLED() 0
-   #define VERBOSE_AI(...)      LANGULUS(NOOP)
-   #define VERBOSE_AI_TAB(...)  LANGULUS(NOOP)
+   #define VERBOSE_AI(...)       LANGULUS(NOOP)
+   #define VERBOSE_AI_TAB(...)   LANGULUS(NOOP)
+   #define VERBOSE_AI_SEEK(...)  LANGULUS(NOOP)
+   #define VERBOSE_AI_BUILD(...) LANGULUS(NOOP)
 #endif
