@@ -15,29 +15,33 @@
 /// Tokenizes, analyzes, collects, resolves ideas, builds metapatterns        
 ///                                                                           
 struct Pattern {
+   LANGULUS_CONVERTS_TO(Text);
+
 private:
    // Decoder                                                           
    Ontology& mOntology;
    // Patterns after collecting                                         
    TMany<Pattern*> mSubpatterns;
    // The original pattern                                              
-   Many mData;
+   Many   mData;
    // The depth of the pattern                                          
    Offset mDepth;
    // Whether or not writing in source is allowed                       
-   bool mWritePermitted = false;
+   bool   mWritePermitted = false;
    // The serialized pattern segment [mStart; mStart + mCount)          
-   Bytes mDataSerialized;
+   Bytes  mDataSerialized;
    // The pattern's resulting idea                                      
    const Idea* mIdea;
    // The resolved idea                                                 
-   Many  mResolved;
+   Many   mResolved;
    // Number of times the pattern has been scanned                      
-   Count mScannedCount = 0;
+   Count  mScannedCount = 0;
 
 public:
    Pattern(Ontology&, const Many&, bool writable, Offset depth = 0);
    ~Pattern() = default;
+
+   Pattern& operator = (Moved<Pattern>&&);
 
    NOD() Offset Interpret(DMeta, Offset limit, Many&);
    NOD() Offset InnerInterpret(DMeta, Many&) const;
@@ -49,11 +53,10 @@ public:
 
    bool IsValid() const noexcept;
    void Resolve(Offset);
-   using IdeaMask = TMap<IdeaID, pcptr>;
-   void AssembleData(Offset, Offset, const Many&, Many&, IdeaMask&) const;
+   void AssembleData(Offset, Offset, const Many&, Many&, IdeaSet&) const;
 
    NOD() auto Gather(DMeta, Many&) const -> Offset;
-   NOD() auto Reduce() -> const Idea*;
+         auto Reduce() -> const Idea*;
    NOD() auto FocusOn(const Many&) const -> Pattern;
 
    auto Collect() -> Count;
@@ -61,8 +64,15 @@ public:
    void Push(Pattern&&);
    void ReplaceWith(Pattern&&);
 
+   explicit operator Text() const;
+
 private:
-   auto InnerSeek () -> const Idea*;
+   auto InnerSeek() -> const Idea*;
    auto InnerBuild() -> const Idea*;
-   void Serialize ();
+   bool InnerGather(
+      const Many& input, Offset depth, Offset& limit, DMeta filter, Many& output
+   ) const;
+
+   void Serialize();
+   Text Self() const;
 };

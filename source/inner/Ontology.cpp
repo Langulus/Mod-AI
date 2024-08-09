@@ -99,16 +99,17 @@ auto Ontology::Represent(const Many& pattern) -> const Idea* {
 void Ontology::Associate(
    const bool invert, const Many& left, const Many& right
 ) {
-   AssociateIdeas(invert, Represent(left), Represent(right));
+   AssociateIdeas(invert, 
+      const_cast<Idea*>(Represent(left)), 
+      const_cast<Idea*>(Represent(right))
+   );
 }
 
 /// Associate two ideas                                                       
 ///   @param invert - whether to associate or disassociate                    
 ///   @param left - the left idea                                             
 ///   @param right - the right idea                                           
-void Ontology::AssociateIdeas(
-   const bool invert, const Idea* lhs, const Idea* rhs
-) {
+void Ontology::AssociateIdeas(const bool invert, Idea* lhs, Idea* rhs) {
    if (lhs == rhs) {
       Logger::Verbose(
          "Skipping ", (invert ? "disassociation - " : "association - "),
@@ -158,4 +159,11 @@ Many Ontology::Deserialize(const Idea* idea) const {
    VERBOSE_AI_ASSEMBLE("Assembled ",
       Logger::PushCyan, idea, Logger::Pop, " to ", output);
    return Abandon(output);
+}
+
+/// Used for logging                                                          
+///   @return text representing this ontology                                 
+Text Ontology::Self() const {
+   TODO();
+   return {};
 }

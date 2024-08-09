@@ -209,7 +209,7 @@ Idea* Idea::Build(
       // because of id mismatches - memory isn't allowed to move.       
       const auto ratio = static_cast<Real>(matches)
                        / static_cast<Real>(mData.GetCount());
-      auto newcrumb = pd.CreateCrumb(1, mData.Select(0, matches));
+      auto newcrumb = pd.CreateIdea(1, mData.Select(0, matches));
       VERBOSE_AI_BUILD("Splitting ", this, ": ", newcrumb, " <-> ", this);
 
       newcrumb->SetParents(mParents);
@@ -228,7 +228,7 @@ Idea* Idea::Build(
          return newcrumb;
       }
 
-      auto branch = pd.CreateCrumb(1, pattern.Select(progress, leftover));
+      auto branch = pd.CreateIdea(1, pattern.Select(progress, leftover));
       branch->AddParent(newcrumb);
       VERBOSE_AI_BUILD("Attached ", branch, " to ", newcrumb);
       newlyBuilt = true;
@@ -248,7 +248,7 @@ Idea* Idea::Build(
    // At this point no child was able to adopt the rest of pattern      
    // and we have to branch off in a new child                          
    const auto leftover = end - progress;
-   auto branch = pd.CreateCrumb(1, pattern.Select(progress, leftover));
+   auto branch = pd.CreateIdea(1, pattern.Select(progress, leftover));
    branch->AddParent(this);
    VERBOSE_AI_BUILD("Attached ", branch, " to ", this);
    newlyBuilt = true;
@@ -289,4 +289,11 @@ Idea* Idea::Seek(
    }
 
    return nullptr;
+}
+
+/// Used for logging                                                          
+///   @return text representing this pattern                                  
+Text Idea::Self() const {
+   TODO();
+   return {};
 }

@@ -26,6 +26,17 @@ Pattern::Pattern(Ontology& onto, const Many& data, bool writable, Offset depth)
    , mDepth          {depth}
    , mWritePermitted {writable} {}
 
+Pattern& Pattern::operator = (Moved<Pattern>&& rhs) {
+   mSubpatterns = Move(rhs->mSubpatterns);
+   mData = Move(rhs->mData);
+   mDepth = rhs->mDepth;
+   mWritePermitted = rhs->mWritePermitted;
+   mIdea = rhs->mIdea;
+   mResolved = Move(rhs->mResolved);
+   mScannedCount = rhs->mScannedCount;
+   return *this;
+}
+
 /// Interpret the idea, gathering data that is relevant to you                
 /// Ideas are like fractals - the deeper you go, the more irrelevant data you 
 /// get. When interpreting this fractal, you might get entire hierarchies as  
@@ -56,7 +67,7 @@ Offset Pattern::InnerInterpret(DMeta filter, Many& relevantSolutions) const {
       }
 
       if (resolved)
-         relevantSolutions.SmartPush(resolved);
+         relevantSolutions.SmartPush(IndexBack, resolved);
    }
    else for (auto subpattern : mSubpatterns) {
       // AND subpatterns                                                
@@ -145,13 +156,13 @@ void Pattern::Compile(Temporal& solution) {
 ///   @param filter - what kind of data are we gathering?                     
 ///   @param output - [out] the results go here (type acts as filter)         
 ///   @return true if something was gathered                                  
-bool InnerGather(
+bool Pattern::InnerGather(
    const Many& input, Offset depth, Offset& limit, DMeta filter, Many& output
-) {
+) const {
    if (depth > limit)
       return false;
 
-   SuccessTrap pushed;
+   bool pushed = false;
    if (input.IsDeep()) {
       // Nest                                                           
       if (input.IsOr()) {
@@ -189,7 +200,7 @@ bool InnerGather(
       else {
          // Gather to the main output                                   
          input.ForEach([&](const Many& subpack) {
-            pushed = InnerGather(subpack, depth + 1, limit, filter, output);
+            pushed |= InnerGather(subpack, depth + 1, limit, filter, output);
          });
       }
 
@@ -197,7 +208,7 @@ bool InnerGather(
    }
 
    // If this is reached, then the provided scope is flat               
-   if (input.InterpretsAs(filter)) {
+   if (input.CastsToMeta(filter)) {
       // The input is compatible with the filter                        
       if (depth < limit and not output.IsEmpty()) {
          // Better match was gathered, so reset output                  
@@ -206,7 +217,7 @@ bool InnerGather(
          output.Clear();
       }
 
-      pushed = output.SmartPush(Many {input});
+      pushed = output.SmartPush(IndexBack, Many {input});
       VERBOSE_AI_GATHER("Gathered (at depth ", depth, ") ", input);
       limit = depth;
       return pushed;
@@ -228,7 +239,7 @@ bool InnerGather(
       );
 
       limit = depth;
-      pushed = output.SmartPush(interpreter.GetOutput());
+      pushed = output.SmartPush(IndexBack, interpreter.GetOutput());
    }
 
    return pushed;
@@ -241,17 +252,16 @@ bool InnerGather(
 ///   @param output - [out] results go here                                   
 ///   @return the depth at which output was gathered                          
 Offset Pattern::Gather(DMeta filter, Many& output) const {
-   if (not filter or filter->IsDeep()) {
+   if (not filter or filter->mIsDeep) {
       // No filter, so push everything inside without filtering         
       output << mData << mResolved;
       return 0;
    }
 
    // First gather inside the pattern itself                            
-   if (mData.InterpretsAs(filter)) {
+   if (mData.CastsToMeta(filter)) {
       // The data is compatible with the filter                         
-      Many shallowCopy = mData;
-      if (output.SmartPush(shallowCopy)) {
+      if (output.SmartPush(IndexBack, mData)) {
          VERBOSE_AI_GATHER("Gathered (from pattern) ", mData);
          return 0;
       }
@@ -297,11 +307,10 @@ Many CoalesceBases(const RTTI::Base& base, const Many& range) {
    // We need to separate each base and push it individually to         
    // a separate dedicated container                                    
    auto baseRange = Many::FromMeta(base.mType, range.GetUnconstrainedState());
-   baseRange.Allocate(base.mStaticBase.mCount * range.GetCount());
    for (Count e = 0; e < range.GetCount(); ++e) {
       auto element = range.GetElement(e);
       auto baseBlock = element.GetBaseMemory(base.mType, base);
-      baseRange.InsertBlock(baseBlock);
+      baseRange.InsertBlock(IndexBack, baseBlock);
    }
 
    return baseRange;
@@ -346,11 +355,11 @@ Offset Pattern::Collect() {
    }
 
    // If this is reached, then we're collecting a fresh pattern         
-   if (mData.Is<GASM>()) {
+   if (mData.Is<Code>()) {
       // If contained data is GASM code - parse it                      
       // It's the first thing we do, because it might produce stuff     
       auto allParsed = Many::FromState(mData);
-      mData.ForEach([&allParsed](const GASM& block) {
+      mData.ForEach([&allParsed](const Code& block) {
          auto parsed = block.Parse();
          if (parsed.IsValid())
             allParsed << Move(parsed);
@@ -358,9 +367,9 @@ Offset Pattern::Collect() {
       mData = Move(allParsed);
    }
 
-   if (mData.Is<IdeaID>() and mData.GetCount() == 1) {
+   if (mData.Is<Idea>() and mData.GetCount() == 1) {
       // Data is already an idea, no need to search for patterns        
-      mIdea = mData.Get<IdeaID>();
+      mIdea = mData.Get<Idea*>();
       return 0;
    }
 
@@ -369,7 +378,7 @@ Offset Pattern::Collect() {
       // There is no escape from this scope                             
       Offset gap = 0;
       VERBOSE_AI_COLLECT_TAB("Analyzing deep ", *this);
-      mSubpatterns.ToggleState(mData.GetUnconstrainedState());
+      mSubpatterns.AddState(mData.GetUnconstrainedState());
       mData.ForEach([&](const Many& subData) {
          auto subpattern = FocusOn(subData);
          gap = ::std::max(gap, subpattern.Collect());
@@ -396,7 +405,7 @@ Offset Pattern::Collect() {
       // No match found for that length, but we can dig deeper, by      
       // also comparing bases                                           
       const auto& range = subpattern.mData;
-      for (auto& base : range.GetMeta()->GetBaseList()) {
+      for (auto& base : range.GetType()->mBases) {
          const auto coalesced = CoalesceBases(base, range);
          if (coalesced.IsEmpty())
             continue;
@@ -451,7 +460,10 @@ auto Pattern::Reduce() -> const Idea* {
       // Nested idea is exactly one...                                  
       if (built) {
          // ... associate newly built idea with the subidea             
-         mOntology.AssociateIdeas(false, mIdea, mSubpatterns[0]->Reduce());
+         mOntology.AssociateIdeas(false, 
+            const_cast<Idea*>(mIdea), 
+            const_cast<Idea*>(mSubpatterns[0]->Reduce())
+         );
       }
       else {
          // ... not allowed to associate, reduce and return subidea     
@@ -462,10 +474,9 @@ auto Pattern::Reduce() -> const Idea* {
    }
 
    // Collect the subpattern ideas                                      
-   Ideas ideas;
+   TMany<const Idea*> ideas;
    if (mSubpatterns) {
-      ideas.ToggleState(mSubpatterns.GetUnconstrainedState());
-      ideas.Allocate(mSubpatterns.GetCount());
+      ideas.AddState(mSubpatterns.GetUnconstrainedState());
       for (auto subpattern : mSubpatterns)
          ideas << subpattern->Reduce();
    }
@@ -477,12 +488,17 @@ auto Pattern::Reduce() -> const Idea* {
       metaGap = metapattern.Collect();
    metapattern.Reduce();
 
-   if (built)
+   if (built) {
       // Associate newly built idea with the metapattern                
-      mOntology.AssociateIdeas(false, mIdea, metapattern.mIdea);
-   else
+      mOntology.AssociateIdeas(false,
+         const_cast<Idea*>(mIdea),
+         const_cast<Idea*>(metapattern.mIdea)
+      );
+   }
+   else {
       // Not allowed to associate, reduce and return metapattern        
       mIdea = metapattern.mIdea;
+   }
    return mIdea;
 }
 
@@ -593,7 +609,7 @@ void Pattern::Resolve(const Offset limit) {
    else if (mIdea) {
       // Assemble the crumb corresponding to the idea                   
       // This includes associations and deductions/inductions           
-      IdeaMask mask;
+      IdeaSet mask;
       Many assembled;
       AssembleData(0, limit, mIdea, assembled, mask);
 
@@ -615,7 +631,7 @@ void Pattern::Resolve(const Offset limit) {
    while (moar);
 }
 
-/// A nested crumb deserializer                                               
+/// A nested idea deserializer                                                
 ///   @param depth - the current depth of the idea hierarchy                  
 ///   @param limit - the biggest allowed depth of the idea                    
 ///   @param input - input data                                               
@@ -623,7 +639,7 @@ void Pattern::Resolve(const Offset limit) {
 ///   @param mask - [i/o] mask for infinite regress protection                
 void Pattern::AssembleData(
    const Offset depth, const Offset limit,
-   const Many& input, Many& output, IdeaMask& mask
+   const Many& input, Many& output, IdeaSet& mask
 ) const {
    if (depth > limit)
       return;
@@ -658,28 +674,23 @@ void Pattern::AssembleData(
          }
 
          // Check mask                                                  
-         const auto& found = mask.FindKey(idea);
-         if (found != uiNone and depth > mask.GetValue(found)) {
-            // Idea is already mentioned somewhere prior in hierarchy   
+         if (mask.Contains(idea)) {
+            // Idea was already mentioned somewhere prior in hierarchy  
             if (input.IsOr())
                return;
             continue;
          }
+         else mask << idea;
 
-         // Update mask                                                 
-         mask.Add(idea, depth);
-
-         // Deserialize the idea                                        
+         // Deserialize and assemble the main idea                      
          auto deserialized = mOntology.Deserialize(idea);
-
-         // Assemble the main idea                                      
          Many everything;
          Many assembledIdea;
          AssembleData(depth, limit, deserialized, assembledIdea, mask);
 
          if (assembledIdea) {
             if (flatten)
-               output.InsertBlock(Move(assembledIdea));
+               output.InsertBlock(IndexBack, Move(assembledIdea));
             else
                everything << Move(assembledIdea);
          }
@@ -690,14 +701,14 @@ void Pattern::AssembleData(
 
          if (associations) {
             if (flatten)
-               output.InsertBlock(Move(associations));
+               output.InsertBlock(IndexBack, Move(associations));
             else
                everything << Move(associations);
          }
 
          if (everything) {
             if (flatten)
-               output.InsertBlock(Move(everything));
+               output.InsertBlock(IndexBack, Move(everything));
             else
                local << Move(everything);
          }
@@ -705,7 +716,7 @@ void Pattern::AssembleData(
 
       if (local) {
          if (flatten)
-            output.InsertBlock(Move(local));
+            output.InsertBlock(IndexBack, Move(local));
          else
             output << Move(local);
       }
@@ -736,6 +747,16 @@ bool Pattern::DumpIdeaFractal(const Many& data, Offset target, Offset depth) {
    return false;
 }
 
+/// Check if the pattern is valid                                             
+///   @return true if pattern has been resolved to a single idea, or contains 
+///           subpatterns                                                     
 bool Pattern::IsValid() const noexcept {
-   return mIdea or not mSubpatterns.IsEmpty();
+   return mIdea or mSubpatterns;
+}
+
+/// Used for logging                                                          
+///   @return text representing this pattern                                  
+Text Pattern::Self() const {
+   TODO();
+   return {};
 }

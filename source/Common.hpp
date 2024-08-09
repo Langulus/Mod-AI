@@ -11,6 +11,8 @@
 #include <Flow/Factory.hpp>
 #include <Langulus/AI.hpp>
 
+LANGULUS_EXCEPTION(AI);
+
 using namespace Langulus;
 using namespace Anyness;
 using Temporal = Flow::Temporal;

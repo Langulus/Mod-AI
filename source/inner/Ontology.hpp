@@ -13,6 +13,7 @@ private:
    THive<Idea> mCrumbs;
 
 public:
+   Ontology() = default;
    Ontology(Describe&&);
 
    NOD() auto Build(const Bytes&, bool& newlyBuilt) -> const Idea*;
@@ -20,9 +21,12 @@ public:
    NOD() auto Represent(const Many&) -> const Idea*;
 
    void Associate(bool invert, const Many&, const Many&);
-   void AssociateIdeas(bool invert, const Idea*, const Idea*);
+   void AssociateIdeas(bool invert, Idea*, Idea*);
    NOD() auto Deserialize(const Idea*) const -> Many;
 
    auto CreateIdea(Rating, const Bytes&) -> Idea*;
    void DeleteIdea(Idea*);
+
+private:
+   Text Self() const;
 };

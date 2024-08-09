@@ -21,7 +21,7 @@ struct Mind final : A::Mind, ProducedFrom<AI> {
    LANGULUS(ABSTRACT) false;
    LANGULUS(PRODUCER) AI;
    LANGULUS_BASES(A::Mind);
-   LANGULUS_VERBS(Verbs::Do);
+   LANGULUS_VERBS(Verbs::Do, Verbs::Create);
 
 private:
    // All events the Mind has witnessed                                 

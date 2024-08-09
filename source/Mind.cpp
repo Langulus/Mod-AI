@@ -8,15 +8,10 @@
 #include "Mind.hpp"
 #include "AI.hpp"
 
-#define MIND_VERBOSE(...)     //Logger::Verbose(__VA_ARGS__)
-#define BUILD_VERBOSE(...)    //Logger::Verbose(__VA_ARGS__)
-#define SEEK_VERBOSE(...)     //Logger::Verbose(__VA_ARGS__)
-#define ASSEMBLE_VERBOSE(...)
-
 
 /// Listener construction                                                     
 ///   @param producer - the producer                                          
-///   @param descriptor - instructions for configuring the listener           
+///   @param descriptor - instructions for configuring the mind               
 Mind::Mind(AI* producer, const Neat& descriptor)
    : Resolvable   {this}
    , ProducedFrom {producer, descriptor} {
@@ -26,34 +21,17 @@ Mind::Mind(AI* producer, const Neat& descriptor)
 }
 
 /// A mind records everything that happens around it                          
+/// This happens through a dispatching Do verb                                
 void Mind::Do(Verb&) {
+   TODO();
+}
 
+/// A mind can produce ideas                                                  
+void Mind::Create(Verb&) {
+   TODO();
 }
 
 /// React on environmental change                                             
 void Mind::Refresh() {
 
 }
-
-/// Execute code inside a mind's context                                      
-///   @param code - code to execute in the mind's context                     
-///   @return whether or not execution was a success                          
-/*bool Mind::Run(const Code& code) {
-	auto parsed = code.Parse();
-	MIND_VERBOSE(Logger::White, gasm);
-	MIND_VERBOSE(parsed);
-	Any context { GetBlock() };
-	return Verb::ExecuteScope(context, parsed);
-}*/
-
-/// Interpret a pattern                                                       
-///   @param input - the input data                                           
-///   @param output - [out] the interpretation result                         
-/*void Mind::DoAIAD(const Text& input, CFlow& output) {
-	if (input.IsEmpty())
-		return;
-
-	MIND_VERBOSE("Compiling ", input, " to ", output);
-	Pattern pattern { const_cast<CMind*>(this), input, false };
-	pattern.Compile(std::numeric_limits<pcptr>::max(), output);
-}*/

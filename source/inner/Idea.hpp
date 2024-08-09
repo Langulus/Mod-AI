@@ -7,10 +7,12 @@
 ///                                                                           
 #pragma once
 #include "../Common.hpp"
+#include <Anyness/TSet.hpp>
 
 struct Idea;
 struct Ontology;
 using Ideas = TMany<Idea*>;
+using IdeaSet = TSet<const Idea*>;
 using Rating = Real;
 
 
@@ -18,6 +20,8 @@ using Rating = Real;
 ///   Part of a Pattern                                                       
 ///                                                                           
 struct Idea : Referenced {
+   LANGULUS_CONVERTS_TO(Text);
+
 protected:
    friend struct Ontology;
 
@@ -35,13 +39,13 @@ protected:
    // Facilitates pattern connections, synonimity and equivalence       
    Ideas mAssociations;
    // Disassociations                                                   
-   // Facilitates inhibitory connections and suppresses equivalence.    
+   // Facilitates inhibitory connections and suppresses equivalence     
    Ideas mDisassociations;
 
 public:
    Idea(Idea*, Rating, const Bytes&);
-   Idea(const Idea&) = default;
-   Idea(Idea&&) noexcept = default;
+   Idea(const Idea&) = delete;
+   Idea(Idea&&) = delete;
 
    bool operator > (const Idea&) const noexcept;
    bool operator < (const Idea&) const noexcept;
@@ -70,4 +74,9 @@ public:
 
    Idea* Build(Ontology&, const Bytes&, Offset progress, Offset end, bool& newlyBuilt);
    Idea* Seek (Ontology&, const Bytes&, Offset progress, Offset end);
+
+   explicit operator Text() const;
+
+private:
+   Text Self() const;
 };
