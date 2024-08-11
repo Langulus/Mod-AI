@@ -757,6 +757,10 @@ bool Pattern::IsValid() const noexcept {
 /// Used for logging                                                          
 ///   @return text representing this pattern                                  
 Text Pattern::Self() const {
-   TODO();
-   return {};
+   return (operator Text()) + ": ";
+}
+
+/// Convert a Pattern to Text                                                 
+Pattern::operator Text() const {
+   return IdentityOf("Pattern", this);
 }

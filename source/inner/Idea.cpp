@@ -292,8 +292,12 @@ Idea* Idea::Seek(
 }
 
 /// Used for logging                                                          
-///   @return text representing this pattern                                  
+///   @return text representing this idea                                     
 Text Idea::Self() const {
-   TODO();
-   return {};
+   return (operator Text()) + ": ";
+}
+
+/// Convert an Idea to Text                                                   
+Idea::operator Text() const {
+   return IdentityOf("Idea", this);
 }
