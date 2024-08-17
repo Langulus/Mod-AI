@@ -23,7 +23,7 @@ struct Society final : A::AIUnit, ProducedFrom<AI> {
 
 private:
    // Shared history                                                    
-   Flow::Temporal mHistory;
+   History mHistory;
    // Shared ontology                                                   
    Ontology mOntology;
    // Participating minds                                               

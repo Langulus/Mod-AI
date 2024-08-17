@@ -16,43 +16,26 @@ CATCH_TRANSLATE_EXCEPTION(::Langulus::Exception const& ex) {
    return ::std::string {Token {serialized}};
 }
 
-SCENARIO("Mind creation", "[ai]") {
+SCENARIO("Idea creation", "[ai]") {
    static Allocator::State memoryState;
    
    for (int repeat = 0; repeat != 10; ++repeat) {
       GIVEN(std::string("Init and shutdown cycle #") + std::to_string(repeat)) {
          // Create root entity                                          
-         auto root = Thing::Root<false>("AI");
+         auto root = Thing::Root("AI");
+         auto mind = root.CreateUnit<A::Mind>();
 
-         WHEN("The mind is created via abstraction") {
-            auto mind = root.CreateUnit<A::Mind>();
-
-            // Update once                                              
-            root.Update({});
-            root.DumpHierarchy();
-
-            REQUIRE(mind.GetCount() == 1);
-            REQUIRE(mind.CastsTo<A::Mind>(1));
-            REQUIRE(mind.IsSparse());
-
-            REQUIRE(root.GetUnits().GetCount() == 1);
-         }
-
-      #if LANGULUS_FEATURE(MANAGED_REFLECTION)
-         WHEN("The mind is created via token") {
-            auto mind = root.CreateUnitToken("Mind");
+         WHEN("An Idea was created") {
+            auto idea = root.Run("create Idea(`one`)");
 
             // Update once                                              
             root.Update({});
             root.DumpHierarchy();
 
-            REQUIRE(mind.GetCount() == 1);
-            REQUIRE(mind.CastsTo<A::Mind>(1));
-            REQUIRE(mind.IsSparse());
-
-            REQUIRE(root.GetUnits().GetCount() == 1);
+            REQUIRE(idea.GetCount() == 1);
+            REQUIRE(idea.GetType()->mToken == "Idea*");
+            REQUIRE(idea.IsSparse());
          }
-      #endif
 
          // Check for memory leaks after each cycle                     
          REQUIRE(memoryState.Assert());

@@ -27,7 +27,6 @@ private:
 
 public:
    AI(Runtime*, const Neat&);
-   ~AI();
 
    bool Update(Time);
    void Create(Verb&);

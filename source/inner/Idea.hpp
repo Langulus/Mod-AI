@@ -11,29 +11,29 @@
 
 struct Idea;
 struct Ontology;
-using Ideas = TMany<Idea*>;
+
+using Ideas   = TMany<Idea*>;
 using IdeaSet = TSet<const Idea*>;
-using Rating = Real;
+using Rating  = Real;
 
 
 ///                                                                           
-///   Part of a Pattern                                                       
+///   An idea                                                                 
 ///                                                                           
-struct Idea : Referenced {
+struct Idea : Referenced, ProducedFrom<Ontology> {
    LANGULUS_CONVERTS_TO(Text);
+   LANGULUS(PRODUCER) Ontology;
 
 protected:
    friend struct Ontology;
 
    // Usage and relevance ratings                                       
    Rating mRating = 0;
-   // The data of the crumb                                             
-   Bytes  mData;
 
    // The crumbs that precede this one (hypergraph if more than one)    
-   Ideas mParents;
+   //Ideas mParents;
    // The crumbs that follow this one                                   
-   Ideas mChildren;
+   //Ideas mChildren;
 
    // Associations                                                      
    // Facilitates pattern connections, synonimity and equivalence       
@@ -43,37 +43,37 @@ protected:
    Ideas mDisassociations;
 
 public:
-   Idea(Idea*, Rating, const Bytes&);
+   Idea(Ontology*, const Neat&/*, Idea*, Rating, const Bytes&*/);
    Idea(const Idea&) = delete;
    Idea(Idea&&) = delete;
 
    bool operator > (const Idea&) const noexcept;
    bool operator < (const Idea&) const noexcept;
 
-   NOD() bool IsOrphan() const noexcept;
-   NOD() bool IsStump() const noexcept;
-   NOD() auto GetData() const noexcept -> const Bytes&;
+   //NOD() bool IsOrphan() const noexcept;
+   //NOD() bool IsStump() const noexcept;
+   //NOD() auto GetData() const noexcept -> const Bytes&;
    NOD() auto GetAssociations() const noexcept -> const Ideas&;
 
    void ResetParents       ();
    void ResetChildren      ();
 
-   void SetParents         (const Ideas&);
-   void SetChildren        (const Ideas&);
-   bool HasChild           (const Idea*) const;
-   bool HasParent          (const Idea*) const;
+   //void SetParents         (const Ideas&);
+   //void SetChildren        (const Ideas&);
+   //bool HasChild           (const Idea*) const;
+   //bool HasParent          (const Idea*) const;
    bool HasAssociation     (const Idea*) const;
    bool HasDisassociation  (const Idea*) const;
 
-   void AddParent          (Idea*);
-   void RemoveParent       (Idea*);
-   void AddChild           (Idea*);
-   void RemoveChild        (Idea*);
+   //void AddParent          (Idea*);
+   //void RemoveParent       (Idea*);
+   //void AddChild           (Idea*);
+   //void RemoveChild        (Idea*);
    void Associate          (Idea*);
    void Disassociate       (Idea*);
 
-   Idea* Build(Ontology&, const Bytes&, Offset progress, Offset end, bool& newlyBuilt);
-   Idea* Seek (Ontology&, const Bytes&, Offset progress, Offset end);
+   /*Idea* Build(Ontology&, const Bytes&, Offset progress, Offset end, bool& newlyBuilt);
+   Idea* Seek (Ontology&, const Bytes&, Offset progress, Offset end);*/
 
    explicit operator Text() const;
 

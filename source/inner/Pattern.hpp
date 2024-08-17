@@ -31,7 +31,7 @@ private:
    // The serialized pattern segment [mStart; mStart + mCount)          
    Bytes  mDataSerialized;
    // The pattern's resulting idea                                      
-   const Idea* mIdea;
+   Idea*  mIdea;
    // The resolved idea                                                 
    Many   mResolved;
    // Number of times the pattern has been scanned                      
@@ -56,7 +56,7 @@ public:
    void AssembleData(Offset, Offset, const Many&, Many&, IdeaSet&) const;
 
    NOD() auto Gather(DMeta, Many&) const -> Offset;
-         auto Reduce() -> const Idea*;
+         auto Reduce() -> Idea*;
    NOD() auto FocusOn(const Many&) const -> Pattern;
 
    auto Collect() -> Count;

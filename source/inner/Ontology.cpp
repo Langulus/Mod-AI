@@ -2,17 +2,26 @@
 #include "Pattern.hpp"
 
 
+/// Default ontology constructor                                              
+Ontology::Ontology() : mIdeas {this} {}
+
 /// Ontology descriptor constructor                                           
 ///   @param d - descriptor                                                   
-Ontology::Ontology(Describe&&) {
+Ontology::Ontology(Describe&&) : mIdeas {this} {
    TODO();
+}
+
+/// Create/Destroy ideas through a verb                                       
+///   @param verb - the verb                                                  
+void Ontology::Create(Verb& verb) {
+   mIdeas.Create(verb);
 }
 
 /// Dissect a pattern and integrate it in the available tissue                
 ///   @param pattern - the pattern to build                                   
 ///   @param newlyBuilt - [out] for debugging only                            
 ///   @return the built idea                                                  
-auto Ontology::Build(const Bytes& pattern, bool& newlyBuilt) -> const Idea* {
+/*auto Ontology::Build(const Bytes& pattern, bool& newlyBuilt) -> const Idea* {
    for (auto& crumb : mCrumbs) {
       if (not crumb.IsOrphan())
          continue;
@@ -166,4 +175,4 @@ Many Ontology::Deserialize(const Idea* idea) const {
 Text Ontology::Self() const {
    TODO();
    return {};
-}
+}*/

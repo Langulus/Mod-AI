@@ -11,7 +11,7 @@ LANGULUS_DEFINE_MODULE(
    AI, 0, "AI",
    "Artificial intelligence module - "
    "allows for simulating minds and societies", "",
-   AI, Society, Mind
+   AI, Society, Mind, Idea
 )
 
 
@@ -27,14 +27,13 @@ AI::AI(Runtime* runtime, const Neat&)
    VERBOSE_AI("Initialized");
 }
 
-///                                                                           
-AI::~AI() {}
-
 /// Module update routine                                                     
 ///   @param deltaTime - time between updates                                 
-///   @return true                                                            
+///   @return false                                                           
 bool AI::Update(Time deltaTime) {
-   return true;
+   for (auto& minds : mMinds)
+      minds.Update(deltaTime);
+   return false;
 }
 
 /// Create/Destroy minds and societies                                        

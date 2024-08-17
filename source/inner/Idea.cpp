@@ -13,17 +13,17 @@
 ///   @param parent - the parent idea                                         
 ///   @param rating - the idea's rating                                       
 ///   @param data - the idea's data                                           
-Idea::Idea(Idea* parent, Rating rating, const Bytes& data)
-   : mRating {rating}
-   , mData   {data} {
-   if (parent) {
+Idea::Idea(Ontology* producer, const Neat& data/*, Idea* parent, Rating rating, const Bytes& data*/)
+   : ProducedFrom {producer, data}
+   /*, mData   {data}*/ {
+   /*if (parent) {
       LANGULUS_ASSUME(DevAssumes, not mParents.Contains(parent),
          "Parent is already linked");
       LANGULUS_ASSUME(DevAssumes, not parent->mChildren.Contains(this),
          "Child is already linked");
       mParents << parent;
       parent->mChildren << this;
-   }
+   }*/
 }
 
 /// Compare crumb ratings                                                     
@@ -42,7 +42,7 @@ bool Idea::operator < (const Idea& other) const noexcept {
 
 /// Check if the crumb has parents                                            
 ///   @return true if crumb has parents                                       
-bool Idea::IsOrphan() const noexcept {
+/*bool Idea::IsOrphan() const noexcept {
    return mParents.IsEmpty();
 }
 
@@ -56,7 +56,7 @@ bool Idea::IsStump() const noexcept {
 ///   @return the size of the crumb in bytes                                  
 auto Idea::GetData() const noexcept -> const Bytes& {
    return mData;
-}
+}*/
 
 /// Get the list of associations                                              
 ///   @return the contained associations                                      
@@ -67,7 +67,7 @@ auto Idea::GetAssociations() const noexcept -> const Ideas& {
 /// Check if crumb has a specific child                                       
 ///   @param crumb - the crumb to search for                                  
 ///   @return true if this crumb has the child                                
-bool Idea::HasChild(const Idea* crumb) const {
+/*bool Idea::HasChild(const Idea* crumb) const {
    return mChildren.Contains(crumb);
 }
 
@@ -139,7 +139,7 @@ void Idea::SetChildren(const Ideas& children) {
    ResetChildren();
    for (auto& p : children)
       AddChild(p);
-}
+}*/
 
 /// Check if crumb has a given association                                    
 ///   @param n - the idea to check if inside associations                     
@@ -184,7 +184,7 @@ void Idea::Disassociate(Idea* n) {
 ///   @param end - the ending index inside pattern bytes                      
 ///   @param newlyBuilt - [out] whether or not a new crumb was built          
 ///   @return the new idea, or badIdea on error                               
-Idea* Idea::Build(
+/*Idea* Idea::Build(
    Ontology& pd, const Bytes& pattern,
    Offset progress, const Offset end, bool& newlyBuilt
 ) {
@@ -289,7 +289,7 @@ Idea* Idea::Seek(
    }
 
    return nullptr;
-}
+}*/
 
 /// Used for logging                                                          
 ///   @return text representing this idea                                     

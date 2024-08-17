@@ -10,7 +10,7 @@
 #include "../AI.hpp"
 
 
-namespace
+/*namespace
 {
    constexpr Offset InfiniteDepth = ::std::numeric_limits<Offset>::max();
 }
@@ -443,7 +443,7 @@ Offset Pattern::Collect() {
 /// complex and writing is allowed - try to represent it as	a single idea     
 /// This function might build more patterns                                   
 ///   @return the idea                                                        
-auto Pattern::Reduce() -> const Idea* {
+auto Pattern::Reduce() -> Idea* {
    if (mIdea)
       return mIdea;
 
@@ -460,10 +460,7 @@ auto Pattern::Reduce() -> const Idea* {
       // Nested idea is exactly one...                                  
       if (built) {
          // ... associate newly built idea with the subidea             
-         mOntology.AssociateIdeas(false, 
-            const_cast<Idea*>(mIdea), 
-            const_cast<Idea*>(mSubpatterns[0]->Reduce())
-         );
+         mIdea->Associate(mSubpatterns[0]->Reduce());
       }
       else {
          // ... not allowed to associate, reduce and return subidea     
@@ -490,10 +487,7 @@ auto Pattern::Reduce() -> const Idea* {
 
    if (built) {
       // Associate newly built idea with the metapattern                
-      mOntology.AssociateIdeas(false,
-         const_cast<Idea*>(mIdea),
-         const_cast<Idea*>(metapattern.mIdea)
-      );
+      mIdea->Associate(metapattern.mIdea);
    }
    else {
       // Not allowed to associate, reduce and return metapattern        
@@ -746,6 +740,7 @@ bool Pattern::DumpIdeaFractal(const Many& data, Offset target, Offset depth) {
       return not data.IsOr();
    return false;
 }
+*/
 
 /// Check if the pattern is valid                                             
 ///   @return true if pattern has been resolved to a single idea, or contains 

@@ -1,22 +1,26 @@
 #pragma once
 #include "Idea.hpp"
-#include <Anyness/THive.hpp>
 #include <Flow/Verbs/Associate.hpp>
+#include <Flow/Factory.hpp>
 
 
 ///                                                                           
 ///   An ontology                                                             
 ///                                                                           
 struct Ontology {
+   LANGULUS_VERBS(Verbs::Create);
+
 private:
-   // The crumbs - each crumb is an idea codepoint                      
-   THive<Idea> mCrumbs;
+   // The ideas                                                         
+   TFactoryUnique<Idea> mIdeas;
 
 public:
-   Ontology() = default;
+   Ontology();
    Ontology(Describe&&);
 
-   NOD() auto Build(const Bytes&, bool& newlyBuilt) -> const Idea*;
+   void Create(Verb&);
+
+   /*NOD() auto Build(const Bytes&, bool& newlyBuilt) -> const Idea*;
    NOD() auto Seek(const Bytes&) -> const Idea*;
    NOD() auto Represent(const Many&) -> const Idea*;
 
@@ -25,7 +29,7 @@ public:
    NOD() auto Deserialize(const Idea*) const -> Many;
 
    auto CreateIdea(Rating, const Bytes&) -> Idea*;
-   void DeleteIdea(Idea*);
+   void DeleteIdea(Idea*);*/
 
 private:
    Text Self() const;
