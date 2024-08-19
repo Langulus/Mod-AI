@@ -16,6 +16,23 @@ CATCH_TRANSLATE_EXCEPTION(::Langulus::Exception const& ex) {
    return ::std::string {Token {serialized}};
 }
 
+namespace Catch
+{
+   template<CT::Stringifiable T>
+   struct StringMaker<T> {
+      static std::string convert(T const& value) {
+         return ::std::string {Token {static_cast<Text>(value)}};
+      }
+   };
+
+   /// Save catch2 from doing infinite recursions with Block types            
+   template<CT::Block T>
+   struct is_range<T> {
+      static const bool value = false;
+   };
+}
+
+
 SCENARIO("Idea creation", "[ai]") {
    static Allocator::State memoryState;
    
@@ -40,6 +57,49 @@ SCENARIO("Idea creation", "[ai]") {
          // Check for memory leaks after each cycle                     
          REQUIRE(memoryState.Assert());
       }
+   }
+}
+
+SCENARIO("Associating ideas", "[ai]") {
+   static Allocator::State memoryState;
+   auto root = Thing::Root("AI");
+   auto mind = root.CreateUnit<A::Mind>();
+
+   GIVEN("Some ideas") {
+      auto idea_one    = root.Run("create Idea(`one`)");
+      auto idea_1      = root.Run("create Idea(1)");
+      auto idea_two    = root.Run("create Idea(`two`)");
+      auto idea_2      = root.Run("create Idea(2)");
+      auto idea_number = root.Run("create Idea(Number)");
+
+      REQUIRE(1 == idea_one.GetCount());
+      REQUIRE(1 == idea_1.GetCount());
+      REQUIRE(1 == idea_two.GetCount());
+      REQUIRE(1 == idea_2.GetCount());
+      REQUIRE(1 == idea_number.GetCount());
+
+      REQUIRE(root.Run("##`one`")  == idea_one);
+      REQUIRE(root.Run("##1")      == idea_1);
+      REQUIRE(root.Run("##`two`")  == idea_two);
+      REQUIRE(root.Run("##2")      == idea_2);
+      REQUIRE(root.Run("##number") == idea_number);
+
+      WHEN("Associating ideas") {
+         root.Run("##`one` = ##1");
+         root.Run("##`two` = ##2");
+         root.Run("##1     = ##number");
+         root.Run("##2     = ##number");
+
+         REQUIRE(root.Run("##`one` == ##1"));
+         REQUIRE(root.Run("##`two` == ##2"));
+         REQUIRE(root.Run("##1     == ##number"));
+         REQUIRE(root.Run("##2     == ##number"));
+         REQUIRE(root.Run("##`one` == ##number"));
+         REQUIRE(root.Run("##`two` == ##number"));
+      }
+
+      // Check for memory leaks after each cycle                        
+      REQUIRE(memoryState.Assert());
    }
 }
 
