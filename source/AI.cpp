@@ -21,8 +21,8 @@ LANGULUS_DEFINE_MODULE(
 AI::AI(Runtime* runtime, const Neat&)
    : Resolvable {this}
    , A::Module  {runtime}
-   , mMinds     {this}
-   , mSocieties {this} {
+   /*, mMinds     {this}
+   , mSocieties {this}*/ {
    VERBOSE_AI("Initializing...");
    VERBOSE_AI("Initialized");
 }
@@ -39,6 +39,6 @@ bool AI::Update(Time deltaTime) {
 /// Create/Destroy minds and societies                                        
 ///   @param verb - the creation/destruction verb                             
 void AI::Create(Verb& verb) {
-   mMinds.Create(verb);
-   mSocieties.Create(verb);
+   mMinds.Create(this, verb);
+   mSocieties.Create(this, verb);
 }

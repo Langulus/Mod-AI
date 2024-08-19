@@ -3,18 +3,18 @@
 
 
 /// Default ontology constructor                                              
-Ontology::Ontology() : mIdeas {this} {}
+Ontology::Ontology() /*: mIdeas {this}*/ {}
 
 /// Ontology descriptor constructor                                           
 ///   @param d - descriptor                                                   
-Ontology::Ontology(Describe&&) : mIdeas {this} {
+Ontology::Ontology(Describe&&) /*: mIdeas {this}*/ {
    TODO();
 }
 
 /// Create/Destroy ideas through a verb                                       
 ///   @param verb - the verb                                                  
 void Ontology::Create(Verb& verb) {
-   mIdeas.Create(verb);
+   mIdeas.Create(this, verb);
 }
 
 /// Dissect a pattern and integrate it in the available tissue                
