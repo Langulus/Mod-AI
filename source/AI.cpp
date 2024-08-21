@@ -20,9 +20,7 @@ LANGULUS_DEFINE_MODULE(
 ///   @param descriptor - instructions for configuring the module             
 AI::AI(Runtime* runtime, const Neat&)
    : Resolvable {this}
-   , A::Module  {runtime}
-   /*, mMinds     {this}
-   , mSocieties {this}*/ {
+   , A::Module  {runtime} {
    VERBOSE_AI("Initializing...");
    VERBOSE_AI("Initialized");
 }
