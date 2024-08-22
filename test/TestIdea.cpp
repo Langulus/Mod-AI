@@ -65,7 +65,7 @@ SCENARIO("Associating ideas", "[ai]") {
    auto root = Thing::Root("AI");
    auto mind = root.CreateUnit<A::Mind>();
 
-   GIVEN("Some ideas") {
+   GIVEN("Some explicitly created ideas") {
       auto idea_one    = root.Run("create Idea(`one`)");
       auto idea_1      = root.Run("create Idea(1)");
       auto idea_two    = root.Run("create Idea(`two`)");
@@ -78,24 +78,41 @@ SCENARIO("Associating ideas", "[ai]") {
       REQUIRE(1 == idea_2.GetCount());
       REQUIRE(1 == idea_number.GetCount());
 
-      REQUIRE(root.Run("##`one`")  == idea_one);
-      REQUIRE(root.Run("##1")      == idea_1);
-      REQUIRE(root.Run("##`two`")  == idea_two);
-      REQUIRE(root.Run("##2")      == idea_2);
-      REQUIRE(root.Run("##number") == idea_number);
+      REQUIRE(root.Run("##one")      == idea_one);
+      REQUIRE(root.Run("##`one`")    == idea_one);
+      REQUIRE(root.Run("##(1)")      == idea_1);
+      REQUIRE(root.Run("##two")      == idea_two);
+      REQUIRE(root.Run("##`two`")    == idea_two);
+      REQUIRE(root.Run("##(2)")      == idea_2);
+      REQUIRE(root.Run("##(number)") == idea_number);
 
       WHEN("Associating ideas") {
-         root.Run("##`one` = ##1");
-         root.Run("##`two` = ##2");
-         root.Run("##1     = ##number");
-         root.Run("##2     = ##number");
+         root.Run("##one = ##(1)");
+         root.Run("##two = ##(2)");
+         root.Run("##(1) = ##(number)");
+         root.Run("##(2) = ##(number)");
 
-         REQUIRE(root.Run("##`one` == ##1"));
-         REQUIRE(root.Run("##`two` == ##2"));
-         REQUIRE(root.Run("##1     == ##number"));
-         REQUIRE(root.Run("##2     == ##number"));
-         REQUIRE(root.Run("##`one` == ##number"));
-         REQUIRE(root.Run("##`two` == ##number"));
+         REQUIRE(root.Run("##one == ##one"));
+         REQUIRE(root.Run("##one == ##(1)"));
+         REQUIRE(root.Run("##one == ##(number)"));
+         REQUIRE(root.Run("##two == ##two"));
+         REQUIRE(root.Run("##two == ##(2)"));
+         REQUIRE(root.Run("##two == ##(number)"));
+         REQUIRE(root.Run("##(1) == ##one"));
+         REQUIRE(root.Run("##(1) == ##(1)"));
+         REQUIRE(root.Run("##(1) == ##(number)"));
+         REQUIRE(root.Run("##(2) == ##two"));
+         REQUIRE(root.Run("##(2) == ##(2)"));
+         REQUIRE(root.Run("##(2) == ##(number)"));
+         REQUIRE(root.Run("##(number) == ##(number)"));
+         REQUIRE(root.Run("##(number) == ##(1)"));
+         REQUIRE(root.Run("##(number) == ##(2)"));
+         REQUIRE(root.Run("##(number) == ##one"));
+         REQUIRE(root.Run("##(number) == ##two"));
+
+         REQUIRE(root.Run("##one != ##(2)"));
+         REQUIRE(root.Run("##two != ##(1)"));
+         REQUIRE(root.Run("##one != ##two"));
       }
 
       // Check for memory leaks after each cycle                        
