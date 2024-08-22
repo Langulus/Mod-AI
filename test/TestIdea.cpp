@@ -118,5 +118,45 @@ SCENARIO("Associating ideas", "[ai]") {
       // Check for memory leaks after each cycle                        
       REQUIRE(memoryState.Assert());
    }
+
+   GIVEN("Some implicitly created ideas") {
+      auto idea_one    = root.Run("##one");
+      auto idea_1      = root.Run("##(1)");
+      auto idea_two    = root.Run("##two");
+      auto idea_2      = root.Run("##(2)");
+      auto idea_number = root.Run("##(Number)");
+
+      WHEN("Associating ideas") {
+         root.Run("##one = ##(1)");
+         root.Run("##two = ##(2)");
+         root.Run("##(1) = ##(number)");
+         root.Run("##(2) = ##(number)");
+
+         REQUIRE(root.Run("##one == ##one"));
+         REQUIRE(root.Run("##one == ##(1)"));
+         REQUIRE(root.Run("##one == ##(number)"));
+         REQUIRE(root.Run("##two == ##two"));
+         REQUIRE(root.Run("##two == ##(2)"));
+         REQUIRE(root.Run("##two == ##(number)"));
+         REQUIRE(root.Run("##(1) == ##one"));
+         REQUIRE(root.Run("##(1) == ##(1)"));
+         REQUIRE(root.Run("##(1) == ##(number)"));
+         REQUIRE(root.Run("##(2) == ##two"));
+         REQUIRE(root.Run("##(2) == ##(2)"));
+         REQUIRE(root.Run("##(2) == ##(number)"));
+         REQUIRE(root.Run("##(number) == ##(number)"));
+         REQUIRE(root.Run("##(number) == ##(1)"));
+         REQUIRE(root.Run("##(number) == ##(2)"));
+         REQUIRE(root.Run("##(number) == ##one"));
+         REQUIRE(root.Run("##(number) == ##two"));
+
+         REQUIRE(root.Run("##one != ##(2)"));
+         REQUIRE(root.Run("##two != ##(1)"));
+         REQUIRE(root.Run("##one != ##two"));
+      }
+
+      // Check for memory leaks after each cycle                        
+      REQUIRE(memoryState.Assert());
+   }
 }
 
