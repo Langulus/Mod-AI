@@ -78,8 +78,9 @@ SCENARIO("Associating ideas", "[ai]") {
       REQUIRE(1 == idea_2.GetCount());
       REQUIRE(1 == idea_number.GetCount());
 
-      REQUIRE(root.Run("##one")      == idea_one);
+      REQUIRE(root.Run("##(`one`)")  == idea_one);
       REQUIRE(root.Run("##`one`")    == idea_one);
+      REQUIRE(root.Run("##one")      == idea_one);
       REQUIRE(root.Run("##(1)")      == idea_1);
       REQUIRE(root.Run("##two")      == idea_two);
       REQUIRE(root.Run("##`two`")    == idea_two);

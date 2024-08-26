@@ -13,7 +13,9 @@
 ///   @param producer - the idea producer                                     
 ///   @param data - the idea's descriptor                                     
 Idea::Idea(Ontology* producer, const Neat& data)
-   : ProducedFrom {producer, data} {}
+   : ProducedFrom {producer, data} {
+   VERBOSE_AI_BUILD("Defining idea for: ", data);
+}
 
 /// Associate/disassociate ideas                                              
 ///   @param verb - the association verb                                      
