@@ -10,20 +10,21 @@
 
 
 /// Constructor                                                               
-///   @param parent - the parent idea                                         
-///   @param rating - the idea's rating                                       
-///   @param data - the idea's data                                           
-Idea::Idea(Ontology* producer, const Neat& data/*, Idea* parent, Rating rating, const Bytes& data*/)
-   : ProducedFrom {producer, data}
-   /*, mData   {data}*/ {
-   /*if (parent) {
-      LANGULUS_ASSUME(DevAssumes, not mParents.Contains(parent),
-         "Parent is already linked");
-      LANGULUS_ASSUME(DevAssumes, not parent->mChildren.Contains(this),
-         "Child is already linked");
-      mParents << parent;
-      parent->mChildren << this;
-   }*/
+///   @param producer - the idea producer                                     
+///   @param data - the idea's descriptor                                     
+Idea::Idea(Ontology* producer, const Neat& data)
+   : ProducedFrom {producer, data} {}
+
+/// Associate/disassociate ideas                                              
+///   @param verb - the association verb                                      
+void Idea::Associate(Verb& verb) {
+   TODO();
+}
+
+/// Compare ideas                                                             
+///   @param verb - the compare verb                                          
+void Idea::Compare(Verb& verb) const {
+   TODO();
 }
 
 /// Compare crumb ratings                                                     
@@ -40,106 +41,11 @@ bool Idea::operator < (const Idea& other) const noexcept {
    return mRating < other.mRating;
 }
 
-/// Check if the crumb has parents                                            
-///   @return true if crumb has parents                                       
-/*bool Idea::IsOrphan() const noexcept {
-   return mParents.IsEmpty();
-}
-
-/// Check if the crumb has children                                           
-///   @return true if crumb has children                                      
-bool Idea::IsStump() const noexcept {
-   return mChildren.IsEmpty();
-}
-
-/// Get the bytesize of the crumb                                             
-///   @return the size of the crumb in bytes                                  
-auto Idea::GetData() const noexcept -> const Bytes& {
-   return mData;
-}*/
-
 /// Get the list of associations                                              
 ///   @return the contained associations                                      
 auto Idea::GetAssociations() const noexcept -> const Ideas& {
    return mAssociations;
 }
-
-/// Check if crumb has a specific child                                       
-///   @param crumb - the crumb to search for                                  
-///   @return true if this crumb has the child                                
-/*bool Idea::HasChild(const Idea* crumb) const {
-   return mChildren.Contains(crumb);
-}
-
-/// Check if crumb has a specific parent                                      
-///   @param crumb - the crumb to search for                                  
-///   @return true if this crumb has the parent                               
-bool Idea::HasParent(const Idea* crumb) const {
-   return mParents.Contains(crumb);
-}
-
-/// Add a child crumb                                                         
-///   @param crumb - the child crumb to add                                   
-void Idea::AddChild(Idea* crumb) {
-   if (HasChild(crumb))
-      return;
-   crumb->mParents << this;
-   mChildren << crumb;
-}
-
-/// Remove child crumb                                                        
-///   @param crumb - the child crumb to remove                                
-void Idea::RemoveChild(Idea* crumb) {
-   mChildren.Remove(crumb);
-   crumb->mParents.Remove(this);
-}
-
-/// Remove parent                                                             
-///   @param crumb - the parent crumb to remove                               
-void Idea::RemoveParent(Idea* crumb) {
-   mParents.Remove(crumb);
-   crumb->mChildren.Remove(this);
-}
-
-/// Reset all parents                                                         
-void Idea::ResetParents() {
-   for (auto& parent : mParents)
-      parent->mChildren.Remove(this);
-   mParents.Clear();
-}
-
-/// Reset all children                                                        
-void Idea::ResetChildren() {
-   for (auto& child : mChildren)
-      child->mParents.Remove(this);
-   mChildren.Clear();
-}
-
-/// Set the crumb parent                                                      
-///   @param parents - the parents to overwrite with                          
-void Idea::SetParents(const Ideas& parents) {
-   ResetParents();
-   for (auto& p : parents)
-      AddParent(p);
-}
-
-/// Add crumb parent                                                          
-///   @param parent - the parent to add                                       
-void Idea::AddParent(Idea* parent) {
-   if (HasParent(parent))
-      return;
-
-   parent->mChildren << this;
-   mParents << parent;
-}
-
-/// Set the children of the crumb                                             
-///   @param children - the children to overwrite with                        
-void Idea::SetChildren(const Ideas& children) {
-   ResetChildren();
-   for (auto& p : children)
-      AddChild(p);
-}*/
 
 /// Check if crumb has a given association                                    
 ///   @param n - the idea to check if inside associations                     

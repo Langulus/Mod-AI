@@ -126,6 +126,12 @@ SCENARIO("Associating ideas", "[ai]") {
       auto idea_2      = root.Run("##(2)");
       auto idea_number = root.Run("##(Number)");
 
+      REQUIRE(1 == idea_one.GetCount());
+      REQUIRE(1 == idea_1.GetCount());
+      REQUIRE(1 == idea_two.GetCount());
+      REQUIRE(1 == idea_2.GetCount());
+      REQUIRE(1 == idea_number.GetCount());
+
       WHEN("Associating ideas") {
          root.Run("##one = ##(1)");
          root.Run("##two = ##(2)");

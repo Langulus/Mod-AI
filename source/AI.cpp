@@ -25,6 +25,14 @@ AI::AI(Runtime* runtime, const Neat&)
    VERBOSE_AI("Initialized");
 }
 
+/// Shutdown PhysFS                                                           
+AI::~AI() {
+   for (auto& minds : mMinds)
+      minds.Detach();
+   for (auto& society : mSocieties)
+      society.Detach();
+}
+
 /// Module update routine                                                     
 ///   @param deltaTime - time between updates                                 
 ///   @return false                                                           

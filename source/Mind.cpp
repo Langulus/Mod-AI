@@ -20,6 +20,13 @@ Mind::Mind(AI* producer, const Neat& descriptor)
    VERBOSE_AI("Initialized");
 }
 
+/// Destroy anything created                                                  
+void Mind::Detach() {
+   mHistory.Reset();
+   mOntology.Detach();
+   ProducedFrom::Detach();
+}
+
 /// A mind records everything that happens around it                          
 /// This happens through a dispatching Do verb                                
 ///   @param verb - the verb to log and dispatch                              

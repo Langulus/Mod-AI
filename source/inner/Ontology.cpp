@@ -11,6 +11,10 @@ Ontology::Ontology(Describe&&) /*: mIdeas {this}*/ {
    TODO();
 }
 
+void Ontology::Detach() {
+   mIdeas.Reset();
+}
+
 /// Create/Destroy ideas through a verb                                       
 ///   @param verb - the verb                                                  
 void Ontology::Create(Verb& verb) {

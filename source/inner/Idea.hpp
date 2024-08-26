@@ -8,6 +8,8 @@
 #pragma once
 #include "../Common.hpp"
 #include <Anyness/TSet.hpp>
+#include <Flow/Verbs/Associate.hpp>
+#include <Flow/Verbs/Compare.hpp>
 
 struct Idea;
 struct Ontology;
@@ -23,6 +25,7 @@ using Rating  = Real;
 struct Idea : Referenced, ProducedFrom<Ontology> {
    LANGULUS_CONVERTS_TO(Text);
    LANGULUS(PRODUCER) Ontology;
+   LANGULUS_VERBS(Verbs::Compare, Verbs::Associate);
 
 protected:
    friend struct Ontology;
@@ -46,6 +49,9 @@ public:
    Idea(Ontology*, const Neat&/*, Idea*, Rating, const Bytes&*/);
    Idea(const Idea&) = delete;
    Idea(Idea&&) = delete;
+
+   void Associate(Verb&);
+   void Compare(Verb&) const;
 
    bool operator > (const Idea&) const noexcept;
    bool operator < (const Idea&) const noexcept;
