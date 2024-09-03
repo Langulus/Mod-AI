@@ -43,7 +43,7 @@ SCENARIO("Idea creation", "[ai]") {
          auto mind = root.CreateUnit<A::Mind>();
 
          WHEN("An Idea was created") {
-            auto idea = root.Run("create Idea(`one`)");
+            auto idea = root.Run("? create Idea(`one`)");
 
             // Update once                                              
             root.Update({});
@@ -66,11 +66,11 @@ SCENARIO("Associating ideas", "[ai]") {
    auto mind = root.CreateUnit<A::Mind>();
 
    GIVEN("Some explicitly created ideas") {
-      auto idea_one    = root.Run("create Idea(`one`)");
-      auto idea_1      = root.Run("create Idea(1)");
-      auto idea_two    = root.Run("create Idea(`two`)");
-      auto idea_2      = root.Run("create Idea(2)");
-      auto idea_number = root.Run("create Idea(Number)");
+      auto idea_one    = root.Run("thing? create Idea(`one`)");
+      auto idea_1      = root.Run("thing? create Idea(1)");
+      auto idea_two    = root.Run("thing? create Idea(`two`)");
+      auto idea_2      = root.Run("thing? create Idea(2)");
+      auto idea_number = root.Run("thing? create Idea(Number)");
 
       REQUIRE(1 == idea_one.GetCount());
       REQUIRE(1 == idea_1.GetCount());
