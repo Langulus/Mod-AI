@@ -87,11 +87,12 @@ SCENARIO("Associating ideas", "[ai]") {
       REQUIRE(root.Run("##(2)")      == idea_2);
       REQUIRE(root.Run("##(number)") == idea_number);
 
-      WHEN("Associating ideas") {
+      WHEN("Associating and disassociating ideas, building a graph") {
          root.Run("##one = ##(1)");
          root.Run("##two = ##(2)");
          root.Run("##(1) = ##(number)");
          root.Run("##(2) = ##(number)");
+         root.Run("##(2) ~ ##(1)");
 
          REQUIRE(root.Run("##one == ##one"));
          REQUIRE(root.Run("##one == ##(1)"));
@@ -111,9 +112,9 @@ SCENARIO("Associating ideas", "[ai]") {
          REQUIRE(root.Run("##(number) == ##one"));
          REQUIRE(root.Run("##(number) == ##two"));
 
-         REQUIRE(root.Run("##one != ##(2)"));
-         REQUIRE(root.Run("##two != ##(1)"));
-         REQUIRE(root.Run("##one != ##two"));
+         REQUIRE_FALSE(root.Run("##one == ##(2)"));
+         REQUIRE_FALSE(root.Run("##two == ##(1)"));
+         REQUIRE_FALSE(root.Run("##one == ##two"));
       }
 
       // Check for memory leaks after each cycle                        
@@ -157,9 +158,9 @@ SCENARIO("Associating ideas", "[ai]") {
          REQUIRE(root.Run("##(number) == ##one"));
          REQUIRE(root.Run("##(number) == ##two"));
 
-         REQUIRE(root.Run("##one != ##(2)"));
-         REQUIRE(root.Run("##two != ##(1)"));
-         REQUIRE(root.Run("##one != ##two"));
+         REQUIRE_FALSE(root.Run("##one == ##(2)"));
+         REQUIRE_FALSE(root.Run("##two == ##(1)"));
+         REQUIRE_FALSE(root.Run("##one == ##two"));
       }
 
       // Check for memory leaks after each cycle                        

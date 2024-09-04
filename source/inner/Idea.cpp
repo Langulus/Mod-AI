@@ -17,16 +17,145 @@ Idea::Idea(Ontology* producer, const Neat& data)
    VERBOSE_AI_BUILD("Defining idea for: ", data);
 }
 
+/// Detach all ideas before destroying them to avoid circular dependencies    
+void Idea::Detach() {
+   mAssociations.Reset();
+   mDisassociations.Reset();
+   mDescriptor.Reset();
+}
+
+/// Get the ontology interface                                                
+///   @return the ontology that produced this idea                            
+auto Idea::GetOntology() const -> Ontology* {
+   return mProducer;
+}
+
 /// Associate/disassociate ideas                                              
 ///   @param verb - the association verb                                      
 void Idea::Associate(Verb& verb) {
-   TODO();
+   // Notice, that an idea can have the same associations and dis-      
+   // associations. This hints at a paradox and is handled in a         
+   // context-dependent way later, when using the ideas.                
+   // Nothing really forces us to not allow paradoxes to exist.         
+   // Our formal system has to consider them - they're part of reality  
+   // after all. Remember our motto: "if you can say it, we have to     
+   // be able to represent it"... so here you are - a paradox in        
+   // the context of Langulus is defined as an idea that points to the  
+   // same associations and disassociations.                            
+   if (verb.GetMass() > 0) {
+      // Associating                                                    
+      if (verb.IsDeep()) {
+         TODO();     // must generate a new idea and associate with that
+                     // preserve hierarchy!
+      }
+      else verb.ForEach([&](Idea* idea) {
+         if (idea->GetOntology() != GetOntology()) {
+            Logger::Error(
+               "Can't associate ideas produced from different ontologies."
+               "Trying to associate ", *this, " with ", *idea
+            );
+            return;  //TODO transfer idea somehow? 
+                     // should generally happen through communication though
+         }
+
+         // Associate symmetrically                                     
+         mAssociations <<= idea;
+         idea->mAssociations <<= this;
+         verb << this;
+         Logger::Info(Logger::Green, "Associated ", *this, " with ", *idea);
+      });
+   }
+   else if (verb.GetMass() < 0) {
+      // Disassociating                                                 
+      if (verb.IsDeep()) {
+         TODO();     // must generate a new idea and disassociate with that 
+                     // preserve hierarchy!
+      }
+      else verb.ForEach([&](Idea* idea) {
+         if (idea->GetOntology() != GetOntology()) {
+            Logger::Error(
+               "Can't disassociate ideas produced from different ontologies."
+               "Trying to disassociate ", *this, " from ", *idea
+            );
+            return;  //TODO transfer idea somehow? 
+                     // should generally happen through communication though
+         }
+
+         // Disassociate symmetrically                                  
+         mDisassociations <<= idea;
+         idea->mDisassociations <<= this;
+         verb << this;
+         Logger::Info(Logger::Green, "Disassociated ", *this, " from ", *idea);
+      });
+   }
 }
 
 /// Compare ideas                                                             
+/// Ideas are the same, if RHS is the same, or an association to LHS          
+/// They don't need to match exactly. The natural language equivalent to this 
+/// is simply asking "is swan a bird?". It will be, if "swan" contains "bird".
+/// Here's how this looks in code:                                            
+///                                                                           
+///   { ##swan == ##bird } will return ##swan if true, or nothing if not      
+///                                                                           
 ///   @param verb - the compare verb                                          
 void Idea::Compare(Verb& verb) const {
-   TODO();
+   Count matches = 0;
+
+   // Check if the required associations are available                  
+   if (verb.IsDeep()) {
+      TODO();     // must generate a new idea and check against that
+                  // preserve hierarchy!
+   }
+   else verb.ForEach([&](Idea* idea) {
+      if (this != idea and (not mAssociations.Contains(idea)
+                            or  mDisassociations.Contains(idea))
+      ) {
+         // First order mismatch found, so ideas are not plainly similar
+         // We have to do an advanced graph-walking comparison to make  
+         // sure that there doesn't exist any indirect associations.    
+         IdeaSet mask;
+         if (not AdvancedCompare(idea, mask)) {
+            // Full mismatch found, no point in going further           
+            verb.Done();
+            matches = 0;
+            return Loop::Break;
+         }
+      }
+      
+      ++matches;
+      return Loop::Continue;
+   });
+
+   if (matches)
+      verb << this;
+}
+
+/// Iterates through all nested associations and disassociations in search    
+/// for an idea                                                               
+///   @param what - the idea to search for                                    
+///   @param mask - a set of covered ideas to avoid infinite regresses        
+///   @return the idea which contained the association (if found)             
+const Idea* Idea::AdvancedCompare(const Idea* what, IdeaSet& mask) const {
+   if (mask.Contains(this))
+      return nullptr;
+
+   mask << this;
+   
+   // Make sure that the idea is never found in any disassociations     
+   for (auto idea : mDisassociations) {
+      if (idea == what or idea->AdvancedCompare(what, mask))
+         return nullptr;
+   }
+
+   // Check if idea is found down the associations rabbit hole          
+   for (auto idea : mAssociations) {
+      if (idea == what or idea->AdvancedCompare(what, mask))
+         return this;
+   }
+
+   // If reached, then no association was found                         
+   return nullptr;
 }
 
 /// Compare crumb ratings                                                     

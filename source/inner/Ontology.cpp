@@ -12,7 +12,8 @@ Ontology::Ontology(Describe&&) /*: mIdeas {this}*/ {
 }
 
 void Ontology::Detach() {
-   mIdeas.Reset();
+   for (auto& idea : mIdeas)
+      idea.Detach();
 }
 
 /// Create/Destroy ideas through a verb                                       

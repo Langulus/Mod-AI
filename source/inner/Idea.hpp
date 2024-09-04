@@ -32,12 +32,6 @@ protected:
 
    // Usage and relevance ratings                                       
    Rating mRating = 0;
-
-   // The crumbs that precede this one (hypergraph if more than one)    
-   //Ideas mParents;
-   // The crumbs that follow this one                                   
-   //Ideas mChildren;
-
    // Associations                                                      
    // Facilitates pattern connections, synonimity and equivalence       
    Ideas mAssociations;
@@ -46,43 +40,31 @@ protected:
    Ideas mDisassociations;
 
 public:
-   Idea(Ontology*, const Neat&/*, Idea*, Rating, const Bytes&*/);
+   Idea(Ontology*, const Neat&);
    Idea(const Idea&) = delete;
    Idea(Idea&&) = delete;
 
+   auto GetOntology() const -> Ontology*;
    void Associate(Verb&);
    void Compare(Verb&) const;
+   void Detach();
 
    bool operator > (const Idea&) const noexcept;
    bool operator < (const Idea&) const noexcept;
 
-   //NOD() bool IsOrphan() const noexcept;
-   //NOD() bool IsStump() const noexcept;
-   //NOD() auto GetData() const noexcept -> const Bytes&;
-   NOD() auto GetAssociations() const noexcept -> const Ideas&;
+   NOD() auto GetAssociations()    const noexcept -> const Ideas&;
+   NOD() auto GetDisassociations() const noexcept -> const Ideas&;
 
-   void ResetParents       ();
-   void ResetChildren      ();
-
-   //void SetParents         (const Ideas&);
-   //void SetChildren        (const Ideas&);
-   //bool HasChild           (const Idea*) const;
-   //bool HasParent          (const Idea*) const;
    bool HasAssociation     (const Idea*) const;
    bool HasDisassociation  (const Idea*) const;
 
-   //void AddParent          (Idea*);
-   //void RemoveParent       (Idea*);
-   //void AddChild           (Idea*);
-   //void RemoveChild        (Idea*);
    void Associate          (Idea*);
    void Disassociate       (Idea*);
-
-   /*Idea* Build(Ontology&, const Bytes&, Offset progress, Offset end, bool& newlyBuilt);
-   Idea* Seek (Ontology&, const Bytes&, Offset progress, Offset end);*/
 
    explicit operator Text() const;
 
 private:
+   const Idea* AdvancedCompare(const Idea*, IdeaSet&) const;
    Text Self() const;
+   void Link(Idea*, Ideas&);
 };
