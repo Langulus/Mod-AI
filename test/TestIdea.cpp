@@ -62,10 +62,11 @@ SCENARIO("Idea creation", "[ai]") {
 
 SCENARIO("Associating ideas", "[ai]") {
    static Allocator::State memoryState;
-   auto root = Thing::Root("AI");
-   auto mind = root.CreateUnit<A::Mind>();
 
    GIVEN("Some explicitly created ideas") {
+      auto root = Thing::Root("AI");
+      auto mind = root.CreateUnit<A::Mind>();
+
       auto idea_one    = root.Run("thing? create Idea(`one`)");
       auto idea_1      = root.Run("thing? create Idea(1)");
       auto idea_two    = root.Run("thing? create Idea(`two`)");
@@ -116,12 +117,12 @@ SCENARIO("Associating ideas", "[ai]") {
          REQUIRE_FALSE(root.Run("##two == ##(1)"));
          REQUIRE_FALSE(root.Run("##one == ##two"));
       }
-
-      // Check for memory leaks after each cycle                        
-      REQUIRE(memoryState.Assert());
    }
 
    GIVEN("Some implicitly created ideas") {
+      auto root = Thing::Root("AI");
+      auto mind = root.CreateUnit<A::Mind>();
+
       auto idea_one    = root.Run("##one");
       auto idea_1      = root.Run("##(1)");
       auto idea_two    = root.Run("##two");
@@ -139,6 +140,7 @@ SCENARIO("Associating ideas", "[ai]") {
          root.Run("##two = ##(2)");
          root.Run("##(1) = ##(number)");
          root.Run("##(2) = ##(number)");
+         root.Run("##(2) ~ ##(1)");
 
          REQUIRE(root.Run("##one == ##one"));
          REQUIRE(root.Run("##one == ##(1)"));
@@ -162,9 +164,9 @@ SCENARIO("Associating ideas", "[ai]") {
          REQUIRE_FALSE(root.Run("##two == ##(1)"));
          REQUIRE_FALSE(root.Run("##one == ##two"));
       }
-
-      // Check for memory leaks after each cycle                        
-      REQUIRE(memoryState.Assert());
    }
+
+   // Check for memory leaks after each cycle                           
+   REQUIRE(memoryState.Assert());
 }
 

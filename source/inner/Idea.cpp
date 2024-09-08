@@ -132,7 +132,8 @@ void Idea::Compare(Verb& verb) const {
 }
 
 /// Iterates through all nested associations and disassociations in search    
-/// for an idea                                                               
+/// for an idea. The name of the game is: find if we can walk from this idea  
+/// to 'what' and vice versa, without hitting any disassociation on the way   
 ///   @param what - the idea to search for                                    
 ///   @param mask - a set of covered ideas to avoid infinite regresses        
 ///   @return the idea which contained the association (if found)             
@@ -144,13 +145,18 @@ const Idea* Idea::AdvancedCompare(const Idea* what, IdeaSet& mask) const {
    
    // Make sure that the idea is never found in any disassociations     
    for (auto idea : mDisassociations) {
-      if (idea == what or idea->AdvancedCompare(what, mask))
+      if (idea == what)
+         return nullptr;
+   }
+   for (auto idea : what->mDisassociations) {
+      if (idea == this)
          return nullptr;
    }
 
    // Check if idea is found down the associations rabbit hole          
    for (auto idea : mAssociations) {
-      if (idea == what or idea->AdvancedCompare(what, mask))
+      if (idea == what or idea->AdvancedCompare(what, mask)
+                      and what->AdvancedCompare(idea, mask))
          return this;
    }
 
