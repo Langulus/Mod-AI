@@ -64,7 +64,7 @@ public:
    explicit operator Text() const;
 
 private:
-   const Idea* AdvancedCompare(const Idea*, IdeaSet&) const;
+   auto AdvancedCompare(const Idea*, IdeaSet&) const -> const Idea*;
    Text Self() const;
    void Link(Idea*, Ideas&);
 };

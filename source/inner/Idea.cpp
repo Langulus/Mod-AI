@@ -137,7 +137,7 @@ void Idea::Compare(Verb& verb) const {
 ///   @param what - the idea to search for                                    
 ///   @param mask - a set of covered ideas to avoid infinite regresses        
 ///   @return the idea which contained the association (if found)             
-const Idea* Idea::AdvancedCompare(const Idea* what, IdeaSet& mask) const {
+auto Idea::AdvancedCompare(const Idea* what, IdeaSet& mask) const -> const Idea* {
    if (mask.Contains(this))
       return nullptr;
 
@@ -155,8 +155,8 @@ const Idea* Idea::AdvancedCompare(const Idea* what, IdeaSet& mask) const {
 
    // Check if idea is found down the associations rabbit hole          
    for (auto idea : mAssociations) {
-      if (idea == what or idea->AdvancedCompare(what, mask)
-                      and what->AdvancedCompare(idea, mask))
+      if (idea == what or (idea->AdvancedCompare(what, mask)
+                       and what->AdvancedCompare(idea, mask)))
          return this;
    }
 
