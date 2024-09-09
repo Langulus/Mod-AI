@@ -52,6 +52,12 @@ SCENARIO("Idea creation", "[ai]") {
             REQUIRE(idea.GetCount() == 1);
             REQUIRE(idea.GetType()->mToken == "Idea*");
             REQUIRE(idea.IsSparse());
+
+            THEN("An Idea was associated") {
+               root.Run("##one = ##(1)");
+
+               REQUIRE(root.Run("##one == ##(1)"));
+            }
          }
 
          // Check for memory leaks after each cycle                     
@@ -61,7 +67,7 @@ SCENARIO("Idea creation", "[ai]") {
 }
 
 SCENARIO("Associating ideas", "[ai]") {
-   static Allocator::State memoryState;
+   Allocator::State memoryState;
 
    GIVEN("Some explicitly created ideas") {
       auto root = Thing::Root("AI");
@@ -142,7 +148,7 @@ SCENARIO("Associating ideas", "[ai]") {
          root.Run("##(2) = ##(number)");
          root.Run("##(2) ~ ##(1)");
 
-         /*REQUIRE(root.Run("##one == ##one"));*/
+         REQUIRE(root.Run("##one == ##one"));
          REQUIRE(root.Run("##one == ##(1)"));
          REQUIRE(root.Run("##one == ##(number)"));
          REQUIRE(root.Run("##two == ##two"));
@@ -154,7 +160,7 @@ SCENARIO("Associating ideas", "[ai]") {
          REQUIRE(root.Run("##(2) == ##two"));
          REQUIRE(root.Run("##(2) == ##(2)"));
          REQUIRE(root.Run("##(2) == ##(number)"));
-         /*REQUIRE(root.Run("##(number) == ##(number)"));
+         REQUIRE(root.Run("##(number) == ##(number)"));
          REQUIRE(root.Run("##(number) == ##(1)"));
          REQUIRE(root.Run("##(number) == ##(2)"));
          REQUIRE(root.Run("##(number) == ##one"));
@@ -162,7 +168,7 @@ SCENARIO("Associating ideas", "[ai]") {
 
          REQUIRE_FALSE(root.Run("##one == ##(2)"));
          REQUIRE_FALSE(root.Run("##two == ##(1)"));
-         REQUIRE_FALSE(root.Run("##one == ##two"));*/
+         REQUIRE_FALSE(root.Run("##one == ##two"));
       }
    }
 
