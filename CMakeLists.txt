@@ -21,4 +21,5 @@ target_link_libraries(LangulusModAI
 if(LANGULUS_TESTING)
     enable_testing()
     add_subdirectory(test)
+    add_subdirectory(demo)
 endif()
