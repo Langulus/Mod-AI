@@ -3,24 +3,81 @@
 
 
 /// Default ontology constructor                                              
-Ontology::Ontology() /*: mIdeas {this}*/ {}
+Ontology::Ontology() {}
 
 /// Ontology descriptor constructor                                           
 ///   @param d - descriptor                                                   
-Ontology::Ontology(Describe&&) /*: mIdeas {this}*/ {
+Ontology::Ontology(Describe&&) {
    TODO();
 }
 
+/// Detach all referenced contents, so that circular dependencies are severed 
 void Ontology::Detach() {
    for (auto& idea : mIdeas)
       idea.Detach();
 }
 
-/// Create/Destroy ideas through a verb                                       
+/// Create/destroy ideas through a verb                                       
 ///   @param verb - the verb                                                  
 void Ontology::Create(Verb& verb) {
    mIdeas.Create(this, verb);
 }
+
+/// Build an idea representing a hierarchy                                    
+///   @param data - the hierarchy to represent                                
+///   @return the idea representing the data                                  
+auto Ontology::Build(const Many& data) -> Idea* {
+   Ideas coalesced;
+   if (data.IsOr())
+      coalesced.MakeOr();
+
+   if (data.IsDeep()) {
+      // Represent each group as an idea                                
+      data.ForEach([&](const Many& group) {
+         auto idea = Build(group);
+         if (idea)
+            coalesced << idea;
+      });
+   }
+   else if (data.Is<Idea>()) {
+      // Ideas are forwarded directly                                   
+      data.ForEach([&](const Idea& idea) {
+         coalesced << &const_cast<Idea&>(idea);
+      });
+   }
+   else if (data.Is<Code>()) {
+      // Code data needs to be normalized further, by compiling it      
+      data.ForEach([&](const Code& code) {
+         TODO();
+      });
+   }
+   else if (data.CastsTo<Text>()) {
+      // Text data needs to be normalized further, by interpreting it   
+      data.ForEach([&](const Text& text) {
+         TODO();
+      });
+   }
+   else {
+      // Anything else gets normalized conventionally using Neat        
+      return mIdeas.CreateOne(this, Neat {data});
+   }
+   
+   // Combine all the generated ideas into one and return               
+   if (coalesced) {
+      if (coalesced.GetCount() == 1)
+         return coalesced[0];
+      return mIdeas.CreateOne(this, Neat {coalesced});
+   }
+
+   return {};
+}
+
+
+
+
+
+
+
 
 /// Dissect a pattern and integrate it in the available tissue                
 ///   @param pattern - the pattern to build                                   

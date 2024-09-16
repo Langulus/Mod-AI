@@ -22,4 +22,5 @@ public:
 
    void Create(Verb&);
    void Detach();
+   auto Build(const Many&) -> Idea*;
 };

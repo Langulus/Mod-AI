@@ -64,6 +64,10 @@ public:
    explicit operator Text() const;
 
 private:
+   template<bool ASSOCIATE>
+   bool LinkIdea(Idea*);
+   template<bool ASSOCIATE>
+   void AssociateInner(Verb&);
    auto AdvancedCompare(const Idea*, IdeaSet&) const -> const Idea*;
    Text Self() const;
    void Link(Idea*, Ideas&);

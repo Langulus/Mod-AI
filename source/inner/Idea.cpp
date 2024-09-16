@@ -30,9 +30,41 @@ auto Idea::GetOntology() const -> Ontology* {
    return mProducer;
 }
 
-/// Associate/disassociate ideas                                              
-///   @param verb - the association verb                                      
-void Idea::Associate(Verb& verb) {
+/// Associate/Disassociate with a single idea                                 
+///   @tparam ASSOCIATE - true to associate, false to disassociate            
+///   @param idea - the idea to (dis)associate with                           
+///   @return true if the idea was added as (dis)association                  
+template<bool ASSOCIATE>
+bool Idea::LinkIdea(Idea* idea) {
+   if (idea->GetOntology() != GetOntology()) {
+      Logger::Error(
+         "Can't (dis)associate ideas produced from different ontologies."
+         "Trying to (dis)associate ", *this, " from/with ", *idea
+      );
+      return false;  //TODO transfer idea somehow? 
+                     // should generally happen through communication though
+   }
+
+   // Always symmetrical                                                
+   if constexpr (ASSOCIATE) {
+      mAssociations <<= idea;
+      idea->mAssociations <<= this;
+      Logger::Info(Logger::Green, "Associated ", *this, " with ", *idea);
+   }
+   else {
+      mDisassociations <<= idea;
+      idea->mDisassociations <<= this;
+      Logger::Info(Logger::Green, "Disassociated ", *this, " from ", *idea);
+   }
+
+   return true;
+}
+
+/// Inner (dis)association                                                    
+///   @tparam ASSOCIATE - true to associate, false to disassociate            
+///   @param verb - the verb to satisfy                                       
+template<bool ASSOCIATE>
+void Idea::AssociateInner(Verb& verb) {
    // Notice, that an idea can have the same associations and dis-      
    // associations. This hints at a paradox and is handled in a         
    // context-dependent way later, when using the ideas.                
@@ -40,54 +72,23 @@ void Idea::Associate(Verb& verb) {
    // Our formal system has to consider them - they're part of reality  
    // after all. Remember our motto: "if you can say it, we have to     
    // be able to represent it"... so here you are - a paradox in        
-   // the context of Langulus is defined as an idea that points to the  
-   // same associations and disassociations.                            
-   if (verb.GetMass() > 0) {
-      // Associating                                                    
-      if (verb.IsDeep()) {
-         TODO();     // must generate a new idea and associate with that
-                     // preserve hierarchy!
-      }
-      else verb.ForEach([&](Idea* idea) {
-         if (idea->GetOntology() != GetOntology()) {
-            Logger::Error(
-               "Can't associate ideas produced from different ontologies."
-               "Trying to associate ", *this, " with ", *idea
-            );
-            return;  //TODO transfer idea somehow? 
-                     // should generally happen through communication though
-         }
+   // the context of Langulus is defined as an idea that points to      
+   // conflicting associations and disassociations.                     
 
-         // Associate symmetrically                                     
-         mAssociations <<= idea;
-         idea->mAssociations <<= this;
-         verb << this;
-         Logger::Info(Logger::Green, "Associated ", *this, " with ", *idea);
-      });
-   }
-   else if (verb.GetMass() < 0) {
-      // Disassociating                                                 
-      if (verb.IsDeep()) {
-         TODO();     // must generate a new idea and disassociate with that 
-                     // preserve hierarchy!
-      }
-      else verb.ForEach([&](Idea* idea) {
-         if (idea->GetOntology() != GetOntology()) {
-            Logger::Error(
-               "Can't disassociate ideas produced from different ontologies."
-               "Trying to disassociate ", *this, " from ", *idea
-            );
-            return;  //TODO transfer idea somehow? 
-                     // should generally happen through communication though
-         }
+   // Build an idea representing the argument, and (dis)associate       
+   // with it instead                                                   
+   auto idea = GetOntology()->Build(verb.GetArgument());
+   if (LinkIdea<ASSOCIATE>(idea))
+      verb << this;
+}
 
-         // Disassociate symmetrically                                  
-         mDisassociations <<= idea;
-         idea->mDisassociations <<= this;
-         verb << this;
-         Logger::Info(Logger::Green, "Disassociated ", *this, " from ", *idea);
-      });
-   }
+/// Associate/disassociate ideas                                              
+///   @param verb - the association verb                                      
+void Idea::Associate(Verb& verb) {
+   if (verb.GetMass() > 0)
+      AssociateInner<true>(verb);
+   else if (verb.GetMass() < 0)
+      AssociateInner<false>(verb);
 }
 
 /// Compare ideas                                                             
@@ -219,120 +220,6 @@ void Idea::Disassociate(Idea* n) {
    VERBOSE_AI_SEEK("Decoder: ", Logger::Cyan, this, Logger::Gray,
                    " now antonym to ", Logger::Cyan, n);
 }
-
-/// Integrate a new pattern inside the crumb's kids                           
-///   @param pd - the ontology where new crumbs will be built                 
-///   @param pattern - the byte pattern to build                              
-///   @param progress - the starting index inside pattern bytes               
-///   @param end - the ending index inside pattern bytes                      
-///   @param newlyBuilt - [out] whether or not a new crumb was built          
-///   @return the new idea, or badIdea on error                               
-/*Idea* Idea::Build(
-   Ontology& pd, const Bytes& pattern,
-   Offset progress, const Offset end, bool& newlyBuilt
-) {
-   // Check how many bytes match                                        
-   const auto tsize = end - progress;
-   const auto matches = pattern.Select(progress, tsize).Matches(mData);
-   if (matches == 0)
-      return nullptr;
-
-   progress += matches;
-
-   // Do an early return if match is full for whole pattern             
-   if (progress == end and matches == mData.GetCount()) {
-      newlyBuilt = false;
-      return this;
-   }
-
-   if (matches < mData.GetCount()) {
-      // Match is only partial in this crumb, so we need to split it    
-      // The current one will become the next one. Everything remains   
-      // linked to this crumb so that we don't turn our ideas into mush 
-      // because of id mismatches - memory isn't allowed to move.       
-      const auto ratio = static_cast<Real>(matches)
-                       / static_cast<Real>(mData.GetCount());
-      auto newcrumb = pd.CreateIdea(1, mData.Select(0, matches));
-      VERBOSE_AI_BUILD("Splitting ", this, ": ", newcrumb, " <-> ", this);
-
-      newcrumb->SetParents(mParents);
-      ResetParents();
-      AddParent(newcrumb);
-      mData = mData.Select(matches, mData.GetCount() - matches);
-      newcrumb->mRating += mRating * (1 - ratio);
-      mRating += ratio;
-
-      // The rest of the pattern is attached to newcrumb                
-      const auto leftover = end - progress;
-      if (leftover == 0) {
-         // Match was partial, but the whole pattern is traversed       
-         VERBOSE_AI_BUILD("Splitting was enough");
-         newlyBuilt = true;
-         return newcrumb;
-      }
-
-      auto branch = pd.CreateIdea(1, pattern.Select(progress, leftover));
-      branch->AddParent(newcrumb);
-      VERBOSE_AI_BUILD("Attached ", branch, " to ", newcrumb);
-      newlyBuilt = true;
-      return branch;
-   }
-
-   // At this point match is full                                       
-   // Delegate build process to crumbs, they might adopt it             
-   for (auto& child : mChildren) {
-      const auto result = child->Build(pd, pattern, progress, end, newlyBuilt);
-      if (result) {
-         // Pattern was built somewhere inside children                 
-         return result;
-      }
-   }
-
-   // At this point no child was able to adopt the rest of pattern      
-   // and we have to branch off in a new child                          
-   const auto leftover = end - progress;
-   auto branch = pd.CreateIdea(1, pattern.Select(progress, leftover));
-   branch->AddParent(this);
-   VERBOSE_AI_BUILD("Attached ", branch, " to ", this);
-   newlyBuilt = true;
-   return branch;
-}
-
-/// Seek a pattern and collect all data associations on the way               
-///   @param pd - the ontology where new crumbs will be built                 
-///   @param pattern - the byte pattern to seek                               
-///   @param progress - the starting index inside pattern bytes               
-///   @param end - the ending index inside pattern bytes                      
-///   @return sought idea, or badIdea if not found                            
-Idea* Idea::Seek(
-   Ontology& pd, const Bytes& pattern, Offset progress, const Offset end
-) {
-   // Check how many characters match                                   
-   const auto tsize = end - progress;
-   const auto matches = pattern.Select(progress, tsize).Matches(mData);
-   const auto ratio = static_cast<Real>(matches)
-                    / static_cast<Real>(mData.GetCount());
-   mRating += ratio;
-
-   if (matches == mData.GetCount()) {
-      progress += matches;
-      if (progress == end) {
-         // Full match here, so we found what we seek                   
-         return this;
-      }
-
-      // Partial match found, so propagate to children                  
-      for (auto& child : mChildren) {
-         const auto result = child->Seek(pd, pattern, progress, end);
-         if (result) {
-            // Full match somewhere in children                         
-            return result;
-         }
-      }
-   }
-
-   return nullptr;
-}*/
 
 /// Used for logging                                                          
 ///   @return text representing this idea                                     
