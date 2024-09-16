@@ -24,6 +24,7 @@ add_dependencies(LangulusModAIDemo
     LangulusModLife
     LangulusModNetwork
     LangulusModStoryteller
+    LangulusModUMS
 )
 
 if (NOT ${LANGULUS_TOASTER_MODE})
