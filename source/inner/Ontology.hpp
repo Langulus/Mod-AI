@@ -14,7 +14,7 @@ private:
    // The ideas                                                         
    TFactoryUnique<Idea> mIdeas;
 
-   Text Self() const;
+   //TODO a quick text indexer and auto-completer - iterating all text combinations is costly, use that as an optimization
 
 public:
    Ontology();
@@ -22,5 +22,7 @@ public:
 
    void Create(Verb&);
    void Detach();
-   auto Build(const Many&) -> Idea*;
+   auto Build(const Many&, bool findMetapatterns = true) -> Idea*;
+   auto BuildText(const Text&) -> Idea*;
+   auto Interpret(const Text&) const -> Many;
 };

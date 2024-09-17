@@ -25,8 +25,11 @@ void Ontology::Create(Verb& verb) {
 
 /// Build an idea representing a hierarchy                                    
 ///   @param data - the hierarchy to represent                                
+///   @param findMetapatterns - search for all metapatterns before building   
+///      this way any previously defined complex ideas will be reused, making 
+///      the database denser and smaller. But it costs more time...           
 ///   @return the idea representing the data                                  
-auto Ontology::Build(const Many& data) -> Idea* {
+auto Ontology::Build(const Many& data, bool findMetapatterns) -> Idea* {
    Ideas coalesced;
    if (data.IsOr())
       coalesced.MakeOr();
@@ -46,15 +49,33 @@ auto Ontology::Build(const Many& data) -> Idea* {
       });
    }
    else if (data.Is<Code>()) {
-      // Code data needs to be normalized further, by compiling it      
+      // Code needs to be normalized further, by compiling it. Can't    
+      // just register it as it is - spaces, cases and optional brackets
+      // will produce different hashes and overcomplicate the database. 
       data.ForEach([&](const Code& code) {
-         TODO();
+         auto idea = Build(code.Parse());
+         if (idea)
+            coalesced << idea;
       });
    }
    else if (data.CastsTo<Text>()) {
-      // Text data needs to be normalized further, by interpreting it   
+      // Text data needs to be sanitized further                        
       data.ForEach([&](const Text& text) {
-         TODO();
+         Idea* idea;
+
+         if (findMetapatterns) {
+            // Interpret the text and find all possible metapatterns    
+            auto pattern = Interpret(text);
+            while (FindMetapatterns(pattern))
+               ;
+
+            // Then build an idea from the complex pattern hierarchy    
+            idea = Build(pattern);
+         }
+         else idea = BuildText(text);
+
+         if (idea)
+            coalesced << idea;
       });
    }
    else {
@@ -66,175 +87,99 @@ auto Ontology::Build(const Many& data) -> Idea* {
    if (coalesced) {
       if (coalesced.GetCount() == 1)
          return coalesced[0];
+
+      if (findMetapatterns) {
+         // Find all possible metapatterns                              
+         Many pattern = coalesced;
+         bool metapatternsFound = false;
+         while (FindMetapatterns(pattern))
+            metapatternsFound = true;
+
+         // Then build an idea from the complex pattern hierarchy       
+         if (metapatternsFound)
+            return mIdeas.CreateOne(this, Neat {pattern});
+      }
+
+      // Build an idea from the flat idea sequence                      
       return mIdeas.CreateOne(this, Neat {coalesced});
    }
 
+   // If reached, then no idea was built (empty data?)                  
    return {};
 }
 
+/// Build a text pattern                                                      
+///   @param text - pattern to build idea for                                 
+///   @return the idea representing the text                                  
+auto Ontology::BuildText(const Text& text) -> Idea* {
+   // Everytime we build a text pattern, build a sanitized variant      
+   // (no capital letters) and link it as an association implicitly.    
+   //TODO sanitize away invalid symbols?
+   auto lower = text.Lowercase();
+   if (lower != text) {
+      // Create two ideas and associate them                            
+      // We can't afford to lose the original information, but we also  
+      // want to be able to find loose matches                          
+      auto i1 = mIdeas.CreateOne(this, Neat {text});
+      auto i2 = mIdeas.CreateOne(this, Neat {lower});
+      i1->Associate(i2);
+      return i1;
+   }
 
+   // Text is already sanitized, just return its idea                   
+   return mIdeas.CreateOne(this, Neat {text});
+}
 
+/// Interpret some text                                                       
+///   @param text - text to interpret                                         
+///   @attention text is assumed lowercased!                                  
+///   @return the hierarchy of ideas in the text                              
+auto Ontology::Interpret(const Text& text) const -> Many {
+   // Since this is a natural language module, plausible interpret-     
+   // ations may overlap, and are later weighted and filtered by        
+   // context.                                                          
+   Many vertical;
+   vertical.MakeOr();
 
+   for (Offset i = text.GetCount(); i > 0; --i) {
+      auto token = text.Select(0, i);
+      auto lower = token.Lowercase();
+      auto original = mIdeas.Find(Neat {token});
+      auto lowercased = mIdeas.Find(Neat {lower});
 
+      // Nest for the remainder of text                                 
+      auto tail = Interpret(lower.Select(i));
 
+      // Insert original/lowercased in front of the horizontal container
+      // Optimize if we can                                             
+      TODO();
 
-
-/// Dissect a pattern and integrate it in the available tissue                
-///   @param pattern - the pattern to build                                   
-///   @param newlyBuilt - [out] for debugging only                            
-///   @return the built idea                                                  
-/*auto Ontology::Build(const Bytes& pattern, bool& newlyBuilt) -> const Idea* {
-   for (auto& crumb : mCrumbs) {
-      if (not crumb.IsOrphan())
-         continue;
-
-      const auto result = crumb.Build(
-         *this, pattern, 0, pattern.GetCount(), newlyBuilt);
-      if (result) {
-         if (newlyBuilt)
-            VERBOSE_AI_BUILD(Logger::Green, "Built pattern ", pattern);
-         return result;
+      // Merge vertically with the accumulated interpretations          
+      if (vertical.IsEmpty()) {
+         // Vertical container is still empty, so insert the first level
+         vertical << tail;
       }
-   }
+      else for (Offset i = 0; i < tail.GetCount(); ++i) {
 
-   // Pattern wasn't built as a child, so do it as an orphan            
-   const auto addition = CreateIdea(1, pattern);
-   VERBOSE_AI_BUILD(Logger::Green, "Built pattern ", pattern);
-   newlyBuilt = true;
-   return addition;
-}
-
-/// Recall cached pattern                                                     
-///   @param pattern - the pattern to search for                              
-///   @return the found idea, or nullptr if not found                         
-auto Ontology::Seek(const Bytes& pattern) -> const Idea* {
-   for (auto& crumb : mCrumbs) {
-      if (not crumb.IsOrphan())
-         continue;
-
-      const auto result = crumb.Seek(*this, pattern, 0, pattern.GetCount());
-      if (result) {
-         VERBOSE_AI_SEEK(Logger::Green, "Pattern found ", pattern);
-         return result;
       }
+
+      tail.ForEach([&](const Many& group) {
+
+      });
    }
 
-   VERBOSE_AI_SEEK(Logger::Red, "Seeking pattern failed ", pattern);
-   return nullptr;
+   // This is how 'vertical' should look like in the end:               
+   //    [0]: SOME_TEXT                                                 
+   // or [1]: SOME_TEX, T                                               
+   // or [2]: [0]: SOME_TE, XT                                          
+   //      or [1]: SOME_TE, X, T                                        
+   // or [3]: [0]: SOME_T, EXT                                          
+   //      or [1]: SOME_T, EX, T                                        
+   //      or [2]: [0]: SOME_T, E, XT                                   
+   //           or [1]: SOME_T, E, X, T                                 
+   // or [4]: [0]: SOME_, TEXT                                          
+   //      or [1]: SOME_, TEX, T                                        
+   //      or [2]: [0]: SOME_, TEX, T                                   
+   //           or [1]: SOME_, TE, XT                                   
+   return vertical;
 }
-
-/// Produce a new idea                                                        
-///   @param rating - crumb's initial rating                                  
-///   @param pattern - the pattern                                            
-///   @return the new crumb                                                   
-auto Ontology::CreateIdea(Real rating, const Bytes& pattern) -> Idea* {
-   return mCrumbs.New(nullptr, 0, pattern);
-}
-
-/// Delete an idea                                                            
-///   @param idea - the idea to remove                                        
-void Ontology::DeleteIdea(Idea* idea) {
-   LANGULUS_ASSUME(DevAssumes, idea, "Idea must be valid");
-
-   // Mark everything under that crumb for deletion                     
-   // Crumbs are never deleted at runtime - this is instead batched and 
-   // done upon serialization/optimization.                             
-   for (auto& n : idea->mChildren)
-      DeleteIdea(n);
-
-   idea->mChildren.Reset();
-   idea->mParents.Reset();
-   idea->mAssociations.Reset();
-   idea->mDisassociations.Reset();
-   idea->mData.Reset();
-}
-
-/// Represent a pattern as an idea                                            
-///   @param pattern - the pattern to represent                               
-///   @return the idea representing the pattern                               
-auto Ontology::Represent(const Many& pattern) -> const Idea* {
-   Pattern result {*this, pattern, true};
-
-   // Collect all subpatterns inside the pattern                        
-   // It is done in a while loop to avoid stack overflows               
-   auto gap = pattern.GetCount();
-   while (gap)
-      gap = result.Collect();
-   return result.Reduce();
-}
-
-/// Associate two patterns                                                    
-///   @param invert - whether to associate or disassociate                    
-///   @param left - the left pattern                                          
-///   @param right - the right pattern                                        
-void Ontology::Associate(
-   const bool invert, const Many& left, const Many& right
-) {
-   AssociateIdeas(invert, 
-      const_cast<Idea*>(Represent(left)), 
-      const_cast<Idea*>(Represent(right))
-   );
-}
-
-/// Associate two ideas                                                       
-///   @param invert - whether to associate or disassociate                    
-///   @param left - the left idea                                             
-///   @param right - the right idea                                           
-void Ontology::AssociateIdeas(const bool invert, Idea* lhs, Idea* rhs) {
-   if (lhs == rhs) {
-      Logger::Verbose(
-         "Skipping ", (invert ? "disassociation - " : "association - "),
-         Logger::PushWhite, lhs, Logger::Pop, " to itself");
-      return;
-   }
-   else LANGULUS_ASSERT(lhs and rhs, AI, "Can't associate with bad ideas");
-
-   if (invert) {
-      lhs->Disassociate(rhs);
-      rhs->Disassociate(lhs);
-   }
-   else {
-      lhs->Associate(rhs);
-      rhs->Associate(lhs);
-   }
-
-   Logger::Verbose(
-      (invert ? "Disassociated " : "Associated "),
-      Logger::PushWhite, lhs, Logger::Pop, " with ", Logger::PushWhite, rhs
-   );
-}
-
-/// Deserialize a crumb, gathering its parents backwards                      
-///   @param index - the idea to begin with                                   
-///   @param output - [out] the data gets gathered in this container          
-Many Ontology::Deserialize(const Idea* idea) const {
-   // Collect the bytes in all crumbs, starting with index itself...    
-   VERBOSE_AI_ASSEMBLE_TAB("Assembling ", Logger::Cyan, idea);
-   Bytes serialized = idea->mData;
-
-   // ... and then all parents up to the first orphan                   
-   if (idea->mParents) {
-      auto parent = idea->mParents[0]; //TODO does it allow for hypergraphs then???
-      while (parent) {
-         serialized >> parent->mData;
-
-         if (not parent->mParents)
-            break;
-         parent = parent->mParents[0];
-      }
-   }
-
-   // Deserialize it	into output container                              
-   Many output;
-   serialized.Deserialize(output);
-   VERBOSE_AI_ASSEMBLE("Assembled ",
-      Logger::PushCyan, idea, Logger::Pop, " to ", output);
-   return Abandon(output);
-}
-
-/// Used for logging                                                          
-///   @return text representing this ontology                                 
-Text Ontology::Self() const {
-   TODO();
-   return {};
-}*/
