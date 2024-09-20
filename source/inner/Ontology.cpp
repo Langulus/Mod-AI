@@ -139,7 +139,6 @@ auto Ontology::Interpret(const Text& text) const -> Many {
    // ations may overlap, and are later weighted and filtered by        
    // context.                                                          
    Many result;
-   result.MakeOr();
 
    for (Offset i = text.GetCount(); i > 0; --i) {
       // There are text.GetCount() possible head patterns               
@@ -150,7 +149,8 @@ auto Ontology::Interpret(const Text& text) const -> Many {
       Many head;
       if (token == lower) {
          auto idea = mIdeas.Find(Neat {token});
-         head = idea ? idea : token;
+         if (idea)   head = idea;
+         else        head = token;
       }
       else {
          auto idea1 = mIdeas.Find(Neat {token});
@@ -174,8 +174,7 @@ auto Ontology::Interpret(const Text& text) const -> Many {
          // similar data                                                
          auto tail = Interpret(lower.Select(i));
 
-         if (tail.GetType() == head.GetType()
-         and not head.IsOr() and not tail.IsOr()) {
+         if (tail.IsSimilar(head) and not head.IsOr() and not tail.IsOr()) {
             if (tail.Is<Text>()) {
                // We can optimize further by concatenating texts        
                Text concatenated;
@@ -191,16 +190,84 @@ auto Ontology::Interpret(const Text& text) const -> Many {
             else head.InsertBlock(IndexBack, tail);
          }
          else {
-            //TODO other optimization-worthy cases, like:
-            // (text1, (text2, idea)) -> (text1+text2, idea)
-            // can probably be achieved by concatenating sequential non-or ForEachDeep groups of the same type?
-            head << tail;
+            if (head.Is<Text>() and not head.IsOr() and tail.IsDeep()) {
+               // Other optimization worthy cases, like:                
+               // (text1, (text2, idea)) -> (text1+text2, idea)         
+               Text concatenated;
+
+               // Concat all texts in head                              
+               head.ForEach([&concatenated](const Text& t) {
+                  concatenated += t;
+               });
+
+               // Concat all texts in tail (deeply)                     
+               tail.ForEachDeep<false, false>([&concatenated](const Many& group) {
+                  if (group.IsDeep() and not group.IsOr()) {
+                     // Skip intermediate groups unless they branch     
+                     return Loop::Continue;
+                  }
+
+                  if (not group.Is<Text>() or group.IsOr()) {
+                     // Abort on type mismatch/branch                   
+                     return Loop::Break;
+                  }
+
+                  group.ForEach([&concatenated](const Text& t) {
+                     concatenated += t;
+                  });
+
+                  // Discard the group after being consumed from tail   
+                  return Loop::Discard;
+               });
+
+               head = concatenated;
+            }
+            else if (head.Is<Idea>() and not head.IsOr() and tail.IsDeep()) {
+               //TODO this can be generalized for any type i think
+               // Other optimization worthy cases, like:                
+               // (idea1, (idea2, idea3)) -> (idea1, idea2, idea3)      
+               Many concatenated;
+
+               // Concat all ideas in head                              
+               head.ForEach([&concatenated](Idea* t) {
+                  concatenated << t;
+               });
+
+               // Concat all ideas in tail (deeply)                     
+               tail.ForEachDeep<false, false>([&concatenated](const Many& group) {
+                  if (group.IsDeep() and not group.IsOr()) {
+                     // Skip intermediate groups unless they branch     
+                     return Loop::Continue;
+                  }
+
+                  if (not group.Is<Idea>() or group.IsOr()) {
+                     // Abort on type mismatch/branch                   
+                     return Loop::Break;
+                  }
+
+                  group.ForEach([&concatenated](Idea* t) {
+                     concatenated << t;
+                  });
+
+                  // Discard the group after being consumed from tail   
+                  return Loop::Discard;
+               });
+
+               head = concatenated;
+            }
+            else {
+               // Can't optimize anything                               
+               head << tail;
+            }
          }
       }
       
       // Push the interpretation, avoid duplicating                     
       result <<= head;
    }
+
+   if (result.GetCount() > 1)
+      result.MakeOr();
 
    // This is how 'result' should look like at this point:              
    //    [0]: TEXT                                                      
@@ -214,5 +281,52 @@ auto Ontology::Interpret(const Text& text) const -> Many {
    //      or [2]: T, E, XT                                             
    //              [0]: T, E, XT                                        
    //           or [1]: T, E, X, T                                      
+   //                                                                   
+   // Similar items in non-or sequences will be optimized and flattened 
    return result;
+}
+
+/// Seek for more complex patterns that have been registered in the ontology  
+/// and substitute until nothing remains. This when applied repeatedly        
+/// effectively results in data that is composed of the highest-order ideas   
+/// available in the ontology. Very useful when building ideas on top of      
+/// other ideas! When building ideas, data normalization destroys hierarchy,  
+/// and the only way to restore it is by using deeper and deeper ideas.       
+///   @param data - [in/out] the patterns to scan                             
+///   @return true if at least one pattern was found inside 'data'            
+bool Ontology::FindMetapatterns(Many& data) const {
+   bool atLeastOneMetapatternFound = false;
+
+   data.ForEachDeep([&](Many& group) {
+      for (Offset i = group.GetCount(); i > 1; --i) {
+         auto pattern = group.Select(0, i);
+         auto idea = mIdeas.Find(Neat {pattern});
+         if (not idea)
+            continue;
+         
+         // Metapattern found                                           
+         atLeastOneMetapatternFound = true;
+         auto substitution = Many::FromState(pattern);
+         substitution << idea;
+
+         if (i != group.GetCount()) {
+            if (group.Is<Idea>()) {
+               // Optimize if possible                                  
+               group.Select(i, group.GetCount() - i)
+                  .ForEach([&](Idea* tail) { substitution << tail; });
+            }
+            else substitution << group.Select(i, group.GetCount() - i);
+         }
+
+         // Substitude the pattern for the idea and move on             
+         // Repeat processing this group - type might've changed!       
+         group = substitution;
+         return Loop::Repeat;
+      }
+
+      return Loop::Continue;
+   });
+
+   //TODO must flatten ideas wherever possible
+   return atLeastOneMetapatternFound;
 }
