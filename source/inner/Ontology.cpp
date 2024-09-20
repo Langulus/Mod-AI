@@ -138,48 +138,81 @@ auto Ontology::Interpret(const Text& text) const -> Many {
    // Since this is a natural language module, plausible interpret-     
    // ations may overlap, and are later weighted and filtered by        
    // context.                                                          
-   Many vertical;
-   vertical.MakeOr();
+   Many result;
+   result.MakeOr();
 
    for (Offset i = text.GetCount(); i > 0; --i) {
+      // There are text.GetCount() possible head patterns               
       auto token = text.Select(0, i);
       auto lower = token.Lowercase();
-      auto original = mIdeas.Find(Neat {token});
-      auto lowercased = mIdeas.Find(Neat {lower});
-
-      // Nest for the remainder of text                                 
-      auto tail = Interpret(lower.Select(i));
-
-      // Insert original/lowercased in front of the horizontal container
-      // Optimize if we can                                             
-      TODO();
-
-      // Merge vertically with the accumulated interpretations          
-      if (vertical.IsEmpty()) {
-         // Vertical container is still empty, so insert the first level
-         vertical << tail;
+      
+      // Figure out the head pattern                                    
+      Many head;
+      if (token == lower) {
+         auto idea = mIdeas.Find(Neat {token});
+         head = idea ? idea : token;
       }
-      else for (Offset i = 0; i < tail.GetCount(); ++i) {
-
+      else {
+         auto idea1 = mIdeas.Find(Neat {token});
+         auto idea2 = mIdeas.Find(Neat {lower});
+         if (idea1 and idea2) {
+            head << idea1 << idea2;
+            head.MakeOr();
+         }
+         else if (idea1) {
+            head << idea1;
+         }
+         else if (idea2) {
+            head << token << idea2;
+            head.MakeOr();
+         }
+         else head = token;
       }
 
-      tail.ForEach([&](const Many& group) {
+      if (i < text.GetCount()) {
+         // Nest for the tail - optimize whenever possible by grouping  
+         // similar data                                                
+         auto tail = Interpret(lower.Select(i));
 
-      });
+         if (tail.GetType() == head.GetType()
+         and not head.IsOr() and not tail.IsOr()) {
+            if (tail.Is<Text>()) {
+               // We can optimize further by concatenating texts        
+               Text concatenated;
+               head.ForEach([&concatenated](const Text& t) {
+                  concatenated += t;
+               });
+               tail.ForEach([&concatenated](const Text& t) {
+                  concatenated += t;
+               });
+
+               head = concatenated;
+            }
+            else head.InsertBlock(IndexBack, tail);
+         }
+         else {
+            //TODO other optimization-worthy cases, like:
+            // (text1, (text2, idea)) -> (text1+text2, idea)
+            // can probably be achieved by concatenating sequential non-or ForEachDeep groups of the same type?
+            head << tail;
+         }
+      }
+      
+      // Push the interpretation, avoid duplicating                     
+      result <<= head;
    }
 
-   // This is how 'vertical' should look like in the end:               
-   //    [0]: SOME_TEXT                                                 
-   // or [1]: SOME_TEX, T                                               
-   // or [2]: [0]: SOME_TE, XT                                          
-   //      or [1]: SOME_TE, X, T                                        
-   // or [3]: [0]: SOME_T, EXT                                          
-   //      or [1]: SOME_T, EX, T                                        
-   //      or [2]: [0]: SOME_T, E, XT                                   
-   //           or [1]: SOME_T, E, X, T                                 
-   // or [4]: [0]: SOME_, TEXT                                          
-   //      or [1]: SOME_, TEX, T                                        
-   //      or [2]: [0]: SOME_, TEX, T                                   
-   //           or [1]: SOME_, TE, XT                                   
-   return vertical;
+   // This is how 'result' should look like at this point:              
+   //    [0]: TEXT                                                      
+   // or [1]: TEX, T                                                    
+   // or [2]: TE, XT                                                    
+   //         [0]: TE, XT                                               
+   //      or [1]: TE, X, T                                             
+   // or [3]: T, EXT                                                    
+   //         [0]: T, EXT                                               
+   //      or [1]: T, EX, T                                             
+   //      or [2]: T, E, XT                                             
+   //              [0]: T, E, XT                                        
+   //           or [1]: T, E, X, T                                      
+   return result;
 }
