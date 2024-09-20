@@ -201,7 +201,7 @@ auto Ontology::Interpret(const Text& text) const -> Many {
                });
 
                // Concat all texts in tail (deeply)                     
-               tail.ForEachDeep<false, false>([&concatenated](const Many& group) {
+               tail.ForEachDeep<false, false>([&concatenated](Many& group) {
                   if (group.IsDeep() and not group.IsOr()) {
                      // Skip intermediate groups unless they branch     
                      return Loop::Continue;
@@ -234,7 +234,7 @@ auto Ontology::Interpret(const Text& text) const -> Many {
                });
 
                // Concat all ideas in tail (deeply)                     
-               tail.ForEachDeep<false, false>([&concatenated](const Many& group) {
+               tail.ForEachDeep<false, false>([&concatenated](Many& group) {
                   if (group.IsDeep() and not group.IsOr()) {
                      // Skip intermediate groups unless they branch     
                      return Loop::Continue;
