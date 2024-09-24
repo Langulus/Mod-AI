@@ -12,6 +12,9 @@
 ///   Build ontology                                                          
 ///                                                                           
 void BuildOntology(Thing& root) {
+   root.LoadMod("AssetsGeometry");
+
+   root.Run("##plural         = { ((number? > 1) or Range(1, +∞)) * ?? }");
    root.Run("##hi             = {thing? create user}");
    root.Run("##`,`            = {? conjunct!2 ??}");
    root.Run("##me             = {?.user}");
@@ -28,8 +31,8 @@ void BuildOntology(Thing& root) {
    root.Run("##create         = ##make");
    root.Run("##place          = ##make");
    root.Run("##generate       = ##make");
-   root.Run("##grid           = grid");
-   root.Run("##cube           = cube");
+   root.Run("##grid           = mesh(grid)");
+   root.Run("##cube           = mesh(box)");
    root.Run("##cubes          = ##plural(##cube)");
    root.Run("##universe       = world");
    root.Run("##control        = {? create InputGatherer}");
