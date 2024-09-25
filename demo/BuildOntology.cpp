@@ -14,16 +14,16 @@
 void BuildOntology(Thing& root) {
    root.LoadMod("AssetsGeometry");
 
-   root.Run("##plural         = { ((number? > 1) or Range(1, +∞)) * ?? }");
-   root.Run("##hi             = {thing? create user}");
-   root.Run("##`,`            = {? conjunct!2 ??}");
-   root.Run("##me             = {?.user}");
-   root.Run("##my             = {##me.??}");
+   root.Run("##plural         = { ?? * ((number? > 1) or Range(1, +infinity)) }");
+   root.Run("##hi             = { thing? create user }");
+   root.Run("##`,`            = { ? conjunct!2 ?? }");
+   root.Run("##me             = { ?.user }");
+   root.Run("##my             = { ##me.?? }");
    root.Run("##I              = ##me");
    root.Run("##name           = name");
-   root.Run("##is             = {? = ??}");
+   root.Run("##is             = { ? = ?? }");
    root.Run("##let            = ##`,`");
-   root.Run("##make           = {? create ??}");
+   root.Run("##make           = { ? create ?? }");
    root.Run("##a              = ##(1)");
    //root.Run("##new            = "); // how do we define new??
    root.Run("##game           = (window, renderer, world)");
@@ -35,8 +35,8 @@ void BuildOntology(Thing& root) {
    root.Run("##cube           = mesh(box)");
    root.Run("##cubes          = ##plural(##cube)");
    root.Run("##universe       = world");
-   root.Run("##control        = {? create InputGatherer}");
-   root.Run("##the            = {?.??}");
+   root.Run("##control        = { ? create InputGatherer }");
+   root.Run("##the            = { ?.?? }");
    root.Run("##camera         = camera");
    root.Run("##with           = ##make");
    root.Run("##mouse          = ("
@@ -55,8 +55,8 @@ void BuildOntology(Thing& root) {
    root.Run("##WSAD           = (##W, ##S, ##A, ##D)");
    root.Run("##space          = Keys::Space");
    root.Run("##`left control` = Keys::LeftControl");
-   root.Run("##and            = {?, ??}");
-   root.Run("##giant          = ({?.organism.size * 4} or {##human.size * 4})");
+   root.Run("##and            = { ?, ?? }");
+   root.Run("##giant          = ({ ?.organism.size * 4 } or { ##human.size * 4 })");
    root.Run("##room           = ##invert(##cube)");
    root.Run("##solid          = solid(yes)");
 
@@ -73,9 +73,9 @@ void BuildOntology(Thing& root) {
    root.Run("##seven          = 7");
    root.Run("##eight          = 8");
    root.Run("##nine           = 9");
-   root.Run("##hundred        = {? * 100}");
-   root.Run("##thousand       = {? * 1000}");
-   root.Run("##million        = {? * 1000000}");
+   root.Run("##hundred        = { ? * 100 }");
+   root.Run("##thousand       = { ? * 1000 }");
+   root.Run("##million        = { ? * 1000000 }");
 
    root.Run("##`0`            = 0");
    root.Run("##`1`            = 1");

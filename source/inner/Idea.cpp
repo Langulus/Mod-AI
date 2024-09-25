@@ -99,8 +99,8 @@ void Idea::Associate(Verb& verb) {
 ///                                                                           
 ///   { ##swan == ##bird } will return ##swan if true, or nothing if not      
 ///                                                                           
-///   @param verb - the compare verb                                          
-void Idea::Compare(Verb& verb) const {
+///   @param verb - the equals verb                                           
+void Idea::Equal(Verb& verb) const {
    Count matches = 0;
 
    // Check if the required associations are available                  

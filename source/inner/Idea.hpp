@@ -9,7 +9,7 @@
 #include "../Common.hpp"
 #include <Anyness/TSet.hpp>
 #include <Flow/Verbs/Associate.hpp>
-#include <Flow/Verbs/Compare.hpp>
+#include <Flow/Verbs/Equal.hpp>
 
 struct Idea;
 struct Ontology;
@@ -25,7 +25,7 @@ using Rating  = Real;
 struct Idea : Referenced, ProducedFrom<Ontology> {
    LANGULUS_CONVERTS_TO(Text);
    LANGULUS(PRODUCER) Ontology;
-   LANGULUS_VERBS(Verbs::Compare, Verbs::Associate);
+   LANGULUS_VERBS(Verbs::Equal, Verbs::Associate);
 
 protected:
    friend struct Ontology;
@@ -46,7 +46,7 @@ public:
 
    auto GetOntology() const -> Ontology*;
    void Associate(Verb&);
-   void Compare(Verb&) const;
+   void Equal(Verb&) const;
    void Detach();
 
    bool operator > (const Idea&) const noexcept;
