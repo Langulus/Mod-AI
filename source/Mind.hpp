@@ -46,7 +46,7 @@ private:
    Time mLifetime;
 
 public:
-   Mind(AI*, const Neat&);
+   Mind(AI*, Describe);
 
    void Do(Verb&);
    void Create(Verb&);

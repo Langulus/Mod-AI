@@ -40,7 +40,7 @@ protected:
    Ideas mDisassociations;
 
 public:
-   Idea(Ontology*, const Neat&);
+   Idea(Ontology*, Describe);
    Idea(const Idea&) = delete;
    Idea(Idea&&) = delete;
 

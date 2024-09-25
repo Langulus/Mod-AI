@@ -120,14 +120,14 @@ auto Ontology::BuildText(const Text& text) -> Idea* {
       // Create two ideas and associate them                            
       // We can't afford to lose the original information, but we also  
       // want to be able to find loose matches                          
-      auto i1 = mIdeas.CreateOne(this, Neat {text});
-      auto i2 = mIdeas.CreateOne(this, Neat {lower});
+      auto i1 = mIdeas.CreateOne(this, text);
+      auto i2 = mIdeas.CreateOne(this, lower);
       i1->Associate(i2);
       return i1;
    }
 
    // Text is already sanitized, just return its idea                   
-   return mIdeas.CreateOne(this, Neat {text});
+   return mIdeas.CreateOne(this, text);
 }
 
 /// Interpret some text                                                       
@@ -148,13 +148,13 @@ auto Ontology::Interpret(const Text& text) const -> Many {
       // Figure out the head pattern                                    
       Many head;
       if (token == lower) {
-         auto idea = mIdeas.Find(Neat {token});
+         auto idea = mIdeas.Find(token);
          if (idea)   head = idea;
          else        head = token;
       }
       else {
-         auto idea1 = mIdeas.Find(Neat {token});
-         auto idea2 = mIdeas.Find(Neat {lower});
+         auto idea1 = mIdeas.Find(token);
+         auto idea2 = mIdeas.Find(lower);
          if (idea1 and idea2) {
             head << idea1 << idea2;
             head.MakeOr();

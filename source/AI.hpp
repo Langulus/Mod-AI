@@ -26,7 +26,7 @@ private:
    TFactory<Society> mSocieties;
 
 public:
-   AI(Runtime*, const Neat&);
+   AI(Runtime*, Describe);
    ~AI();
 
    bool Update(Time);

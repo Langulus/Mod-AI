@@ -12,7 +12,7 @@
 /// Gatherer construction                                                     
 ///   @param producer - the system producer                                   
 ///   @param descriptor - instructions for configuring the GUI                
-Society::Society(AI* producer, const Neat& descriptor)
+Society::Society(AI* producer, Describe descriptor)
    : Resolvable   {this}
    , ProducedFrom {producer, descriptor} {
    VERBOSE_AI("Initializing...");

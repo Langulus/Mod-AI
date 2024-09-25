@@ -12,7 +12,7 @@
 /// Mind construction                                                         
 ///   @param producer - the producer                                          
 ///   @param descriptor - instructions for configuring the mind               
-Mind::Mind(AI* producer, const Neat& descriptor)
+Mind::Mind(AI* producer, Describe descriptor)
    : Resolvable   {this}
    , ProducedFrom {producer, descriptor} {
    VERBOSE_AI("Initializing...");
