@@ -19,9 +19,9 @@ Idea::Idea(Ontology* producer, const Many& data)
 
 /// Detach all ideas before destroying them to avoid circular dependencies    
 void Idea::Detach() {
-   mAssociations.Reset();
    mDisassociations.Reset();
-   mDescriptor.Reset();
+   mAssociations.Reset();
+   ProducedFrom::Detach();
 }
 
 /// Get the ontology interface                                                

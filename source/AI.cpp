@@ -25,12 +25,12 @@ AI::AI(Runtime* runtime, const Many&)
    VERBOSE_AI("Initialized");
 }
 
-/// Shutdown PhysFS                                                           
+/// Shutdown AI module                                                        
 AI::~AI() {
-   for (auto& minds : mMinds)
-      minds.Detach();
    for (auto& society : mSocieties)
       society.Detach();
+   for (auto& minds : mMinds)
+      minds.Detach();
 }
 
 /// Module update routine                                                     

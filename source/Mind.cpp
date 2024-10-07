@@ -22,8 +22,9 @@ Mind::Mind(AI* producer, const Many& descriptor)
 
 /// Destroy anything created                                                  
 void Mind::Detach() {
-   mHistory.Reset();
    mOntology.Detach();
+   mHistory.Reset();
+   mSocieties.Reset();
    ProducedFrom::Detach();
 }
 
