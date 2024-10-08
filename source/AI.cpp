@@ -25,14 +25,6 @@ AI::AI(Runtime* runtime, const Many&)
    VERBOSE_AI("Initialized");
 }
 
-/// Shutdown AI module                                                        
-AI::~AI() {
-   for (auto& society : mSocieties)
-      society.Detach();
-   for (auto& minds : mMinds)
-      minds.Detach();
-}
-
 /// Module update routine                                                     
 ///   @param deltaTime - time between updates                                 
 ///   @return false                                                           
