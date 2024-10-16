@@ -27,8 +27,13 @@ struct Mind final : A::Mind, ProducedFrom<AI> {
    LANGULUS_VERBS(Verbs::Do, Verbs::Create);
 
 private:
-   // Societies this mind is part of                                    
-   TMany<Society*> mSocieties;
+   // The mind's lifetime counter                                       
+   // Will not increment while passed out                               
+   Time mLifetime;
+
+   // Mind's private ontology                                           
+   // @attention has to be destroyed last                               
+   Ontology mOntology;
 
    // All events the Mind has witnessed, relative to the Mind's time    
    // This can't be Flow::Temporal for various reasons:                 
@@ -38,12 +43,8 @@ private:
    //    lead to an infinite regress.                                   
    History mHistory;
 
-   // Mind's private ontology                                           
-   Ontology mOntology;
-
-   // The mind's lifetime counter                                       
-   // Will not increment while passed out                               
-   Time mLifetime;
+   // Societies this mind is part of                                    
+   TMany<Society*> mSocieties;
 
 public:
    Mind(AI*, const Many&);
@@ -52,5 +53,5 @@ public:
    void Create(Verb&);
    bool Update(Time);
    void Refresh();
-   void Detach();
+   auto Reference(int) -> Count;
 };
