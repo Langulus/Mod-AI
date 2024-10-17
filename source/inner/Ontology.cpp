@@ -11,19 +11,10 @@ Ontology::Ontology(Describe&&) {
    TODO();
 }
 
-/// Reset the ontology by deleting all ideas                                  
 /// Ideas have their own hierarchy and circular references, and need to be    
 /// teared down before we're able to reset them                               
-void Ontology::Reset() {
-   // Issue a teardown first                                            
-   for (auto& idea : mIdeas) {
-      idea.Teardown();
-      LANGULUS_ASSUME(DevAssumes, idea.GetReferences() == 1,
-         "An Idea is still in use somewhere after a teardown");
-   }
-
-   // Then delete                                                       
-   mIdeas.Reset();
+void Ontology::Teardown() {
+   mIdeas.Teardown();
 }
 
 /// Create/destroy ideas through a verb                                       

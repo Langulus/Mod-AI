@@ -17,21 +17,6 @@ Idea::Idea(Ontology* producer, const Many& data)
    VERBOSE_AI_BUILD("Defining idea for: ", data);
 }
 
-/// Tear apart all ideas before destroying them to avoid circular dependencies
-void Idea::Teardown() {
-   ProducedFrom::Teardown();
-
-   // Make sure we move (dis)associations in a temporary so that we     
-   // don't fall into an endless loop                                   
-   Ideas localDisassociations = Move(mDisassociations);
-   for (auto& idea : localDisassociations)
-      idea->Teardown();
-
-   Ideas localAssociations = Move(mAssociations);
-   for (auto& idea : localAssociations)
-      idea->Teardown();
-}
-
 /// Get the ontology interface                                                
 ///   @return the ontology that produced this idea                            
 auto Idea::GetOntology() const -> Ontology* {

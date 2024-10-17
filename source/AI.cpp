@@ -25,6 +25,12 @@ AI::AI(Runtime* runtime, const Many&)
    VERBOSE_AI("Initialized");
 }
 
+/// First stage destruction                                                   
+void AI::Teardown() {
+   mMinds.Teardown();
+   mSocieties.Teardown();
+}
+
 /// Module update routine                                                     
 ///   @param deltaTime - time between updates                                 
 ///   @return false                                                           

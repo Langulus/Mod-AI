@@ -47,7 +47,6 @@ public:
    auto GetOntology() const -> Ontology*;
    void Associate(Verb&);
    void Equal(Verb&) const;
-   void Teardown();
 
    bool operator > (const Idea&) const noexcept;
    bool operator < (const Idea&) const noexcept;

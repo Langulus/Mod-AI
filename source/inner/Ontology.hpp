@@ -25,5 +25,5 @@ public:
    auto BuildText(const Text&) -> Idea*;
    auto Interpret(const Text&) const -> Many;
    bool FindMetapatterns(Many&) const;
-   void Reset();
+   void Teardown();
 };

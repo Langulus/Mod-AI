@@ -53,5 +53,4 @@ public:
    void Create(Verb&);
    bool Update(Time);
    void Refresh();
-   auto Reference(int) -> Count;
 };

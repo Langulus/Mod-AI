@@ -20,18 +20,6 @@ Mind::Mind(AI* producer, const Many& descriptor)
    VERBOSE_AI("Initialized");
 }
 
-/// Reference the mind, triggering teardown if no longer used                 
-auto Mind::Reference(int x) -> Count {
-   if (A::Mind::Reference(x) == 1) {
-      mSocieties.Reset();
-      mHistory.Reset();
-      mOntology.Reset();
-      ProducedFrom::Teardown();
-   }
-
-   return GetReferences();
-}
-
 /// A mind records everything that happens around it                          
 /// This happens through a dispatching Do verb                                
 ///   @param verb - the verb to log and dispatch                              
