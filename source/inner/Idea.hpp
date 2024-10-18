@@ -44,6 +44,7 @@ public:
    Idea(const Idea&) = delete;
    Idea(Idea&&) = delete;
 
+   void Teardown();
    auto GetOntology() const -> Ontology*;
    void Associate(Verb&);
    void Equal(Verb&) const;
@@ -70,5 +71,4 @@ private:
    auto AdvancedCompare(const Idea*, IdeaSet&) const -> const Idea*;
    Text Self() const;
    void Link(Idea*, Ideas&);
-   void Teardown();
 };
