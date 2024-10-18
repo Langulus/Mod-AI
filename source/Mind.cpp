@@ -20,6 +20,13 @@ Mind::Mind(AI* producer, const Many& descriptor)
    VERBOSE_AI("Initialized");
 }
 
+/// First stage destruction                                                   
+void Mind::Teardown() {
+   mSocieties.Reset();
+   mHistory.Reset();
+   mOntology.Teardown();
+}
+
 /// A mind records everything that happens around it                          
 /// This happens through a dispatching Do verb                                
 ///   @param verb - the verb to log and dispatch                              

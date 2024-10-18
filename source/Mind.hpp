@@ -53,4 +53,5 @@ public:
    void Create(Verb&);
    bool Update(Time);
    void Refresh();
+   void Teardown();
 };

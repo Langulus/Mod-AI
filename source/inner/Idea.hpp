@@ -70,4 +70,5 @@ private:
    auto AdvancedCompare(const Idea*, IdeaSet&) const -> const Idea*;
    Text Self() const;
    void Link(Idea*, Ideas&);
+   void Teardown();
 };

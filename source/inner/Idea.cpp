@@ -17,6 +17,12 @@ Idea::Idea(Ontology* producer, const Many& data)
    VERBOSE_AI_BUILD("Defining idea for: ", data);
 }
 
+/// Tear apart all ideas before destroying them to avoid circular dependencies
+void Idea::Teardown() {
+   mDisassociations.Reset();
+   mAssociations.Reset();
+}
+
 /// Get the ontology interface                                                
 ///   @return the ontology that produced this idea                            
 auto Idea::GetOntology() const -> Ontology* {
