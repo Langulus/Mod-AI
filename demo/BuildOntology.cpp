@@ -88,12 +88,12 @@ void BuildOntology(Thing& root) {
    root.Run("##`8`            = 8");
    root.Run("##`9`            = 9");
 
-   root.Run("##of             = ");
    root.Run("##in             = Ranges::In");
-   root.Run("##at             = Ranges::At");
-   root.Run("##to             = Ranges::To");
+   root.Run("##at             = Ranges::On");
    root.Run("##center         = Ranges::Center");
    root.Run("##behind         = Ranges::Behind");
+   root.Run("##of             = ");
+   root.Run("##to             = ");
    root.Run("##it             = ");
    root.Run("##randomly       = ");
    root.Run("##attach         = ");

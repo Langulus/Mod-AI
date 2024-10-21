@@ -48,6 +48,14 @@ void Mind::Create(Verb& verb) {
    mOntology.Create(verb);
 }
 
+/// Interpret text                                                            
+///   @param the message to interpret                                         
+///   @return the interpreted message                                         
+Many Mind::Interpret(const Text& text) {
+   TODO();
+   return {};
+}
+
 /// Mind update routine                                                       
 ///   @param deltaTime - time between updates                                 
 ///   @return false                                                           
@@ -55,9 +63,4 @@ bool Mind::Update(Time deltaTime) {
    //TODO don't increment time if passed out
    mLifetime += deltaTime;
    return false;
-}
-
-/// React on environmental change                                             
-void Mind::Refresh() {
-
 }

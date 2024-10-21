@@ -51,7 +51,9 @@ public:
 
    void Do(Verb&);
    void Create(Verb&);
+
+   Many Interpret(const Text&);
    bool Update(Time);
-   void Refresh();
+   void Refresh() {};
    void Teardown();
 };

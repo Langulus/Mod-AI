@@ -8,6 +8,8 @@
 #include "AI.hpp"
 #include <Entity/Event.hpp>
 #include <Math/Color.hpp>
+#include <Math/Range.hpp>
+#include <Math/Number.hpp>
 
 LANGULUS_DEFINE_MODULE(
    AI, 0, "AI",
@@ -26,6 +28,9 @@ AI::AI(Runtime* runtime, const Many&)
    VERBOSE_AI("Initializing...");
    Langulus::RegisterEvents();
    Langulus::Math::RegisterColors();
+   Langulus::Math::RegisterVectors();
+   Langulus::Math::RegisterRanges();
+   Langulus::Math::RegisterNumbers();
    VERBOSE_AI("Initialized");
 }
 
