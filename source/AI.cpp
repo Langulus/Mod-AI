@@ -6,6 +6,8 @@
 /// SPDX-License-Identifier: GPL-3.0-or-later                                 
 ///                                                                           
 #include "AI.hpp"
+#include <Entity/Event.hpp>
+#include <Math/Color.hpp>
 
 LANGULUS_DEFINE_MODULE(
    AI, 0, "AI",
@@ -22,6 +24,8 @@ AI::AI(Runtime* runtime, const Many&)
    : Resolvable {this}
    , A::Module  {runtime} {
    VERBOSE_AI("Initializing...");
+   Langulus::RegisterEvents();
+   Langulus::Math::RegisterColors();
    VERBOSE_AI("Initialized");
 }
 
