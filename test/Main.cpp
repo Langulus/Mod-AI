@@ -13,6 +13,12 @@
 LANGULUS_RTTI_BOUNDARY(RTTI::MainBoundary)
 
 int main(int argc, char* argv[]) {
+   Logger::ToTXT logFile {"ai-test.txt"};
+   Logger::AttachDuplicator(&logFile);
+
    Catch::Session session;
-   return session.run(argc, argv);
+   auto result = session.run(argc, argv);
+
+   Logger::DettachDuplicator(&logFile);
+   return result;
 }
