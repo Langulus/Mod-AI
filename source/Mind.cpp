@@ -14,7 +14,8 @@
 ///   @param descriptor - instructions for configuring the mind               
 Mind::Mind(AI* producer, const Many& descriptor)
    : Resolvable   {this}
-   , ProducedFrom {producer, descriptor} {
+   , ProducedFrom {producer, descriptor}
+   , mOntology    {*this} {
    VERBOSE_AI("Initializing...");
    Couple(descriptor);
    VERBOSE_AI("Initialized");
@@ -52,7 +53,9 @@ void Mind::Create(Verb& verb) {
 ///   @param the message to interpret                                         
 ///   @return the interpreted message                                         
 Many Mind::Interpret(const Text& text) {
-   TODO();
+   Text cloned = Clone(text);
+   auto parsed = mOntology.Interpret(cloned);
+   VERBOSE_AI("Parsed `", cloned, "` into: ", parsed);
    return {};
 }
 

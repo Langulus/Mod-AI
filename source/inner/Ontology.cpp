@@ -3,12 +3,18 @@
 
 
 /// Default ontology constructor                                              
-Ontology::Ontology() {}
+Ontology::Ontology(const A::AIUnit& c) : mOwner {c} {}
 
 /// Ontology descriptor constructor                                           
 ///   @param d - descriptor                                                   
-Ontology::Ontology(Describe&&) {
+Ontology::Ontology(const A::AIUnit& c, const Many&) : mOwner {c} {
    TODO();
+}
+
+/// Ideas have their own hierarchy and circular references, and need to be    
+/// teared down before we're able to reset them                               
+Text Ontology::Self() const {
+   return mOwner.Self();
 }
 
 /// Ideas have their own hierarchy and circular references, and need to be    
@@ -30,6 +36,9 @@ void Ontology::Create(Verb& verb) {
 ///      the database denser and smaller. But it costs more time...           
 ///   @return the idea representing the data                                  
 auto Ontology::Build(const Many& data, bool findMetapatterns) -> Idea* {
+   // Clear the cache every time we build a new pattern                 
+   mCache.Clear();
+
    Ideas coalesced;
    if (data.IsOr())
       coalesced.MakeOr();
@@ -135,14 +144,21 @@ auto Ontology::BuildText(const Text& text) -> Idea* {
 ///   @attention text is assumed lowercased!                                  
 ///   @return the hierarchy of ideas in the text                              
 auto Ontology::Interpret(const Text& text) const -> Many {
+   // Is the text available in the cache? Directly return it if so      
+   VERBOSE_AI_INTERPRET_TAB("Interpreting: ", text);
+   const auto cached = mCache.FindIt(text);
+   if (cached) {
+      VERBOSE_AI_INTERPRET("Cached: ", cached.GetValue());
+      return cached.GetValue();
+   }
+
    // Since this is a natural language module, plausible interpret-     
    // ations may overlap, and are later weighted and filtered by        
    // context.                                                          
    Many result;
-
    for (Offset i = text.GetCount(); i > 0; --i) {
       // There are text.GetCount() possible head patterns               
-      auto token = text.Select(0, i);
+      Text token = text.Select(0, i);
       auto lower = token.Lowercase();
       
       // Figure out the head pattern                                    
@@ -168,11 +184,13 @@ auto Ontology::Interpret(const Text& text) const -> Many {
          }
          else head = token;
       }
+      VERBOSE_AI_INTERPRET("Head: ", head);
 
       if (i < text.GetCount()) {
          // Nest for the tail - optimize whenever possible by grouping  
          // similar data                                                
-         auto tail = Interpret(lower.Select(i));
+         auto tail = Interpret(text.Select(i));
+         VERBOSE_AI_INTERPRET("Tail: ", tail);
 
          if (tail.IsSimilar(head) and not head.IsOr() and not tail.IsOr()) {
             if (tail.Is<Text>()) {
@@ -263,6 +281,8 @@ auto Ontology::Interpret(const Text& text) const -> Many {
       }
       
       // Push the interpretation, avoid duplicating                     
+      VERBOSE_AI_INTERPRET("Final: ", token, " -> ", head);
+      mCache.Insert(token, head);
       result <<= head;
    }
 

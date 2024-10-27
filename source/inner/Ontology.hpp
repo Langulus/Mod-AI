@@ -11,14 +11,21 @@ struct Ontology {
    LANGULUS_VERBS(Verbs::Create);
 
 private:
+   // The owning component                                              
+   const A::AIUnit& mOwner;
+
    // The ideas                                                         
    TFactoryUnique<Idea> mIdeas;
 
-   //TODO a quick text indexer and auto-completer - iterating all text combinations is costly, use that as an optimization
+   // Quick text indexer and auto-completer - iterating all text        
+   // combinations in a prompt is costly - use that as an optimization  
+   mutable TUnorderedMap<Text, Many> mCache;
+
+   Text Self() const;
 
 public:
-   Ontology();
-   Ontology(Describe&&);
+   Ontology(const A::AIUnit&);
+   Ontology(const A::AIUnit&, const Many&);
 
    void Create(Verb&);
    auto Build(const Many&, bool findMetapatterns = true) -> Idea*;

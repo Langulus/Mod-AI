@@ -14,7 +14,8 @@
 ///   @param descriptor - instructions for configuring the GUI                
 Society::Society(AI* producer, const Many& descriptor)
    : Resolvable   {this}
-   , ProducedFrom {producer, descriptor} {
+   , ProducedFrom {producer, descriptor}
+   , mOntology    {*this} {
    VERBOSE_AI("Initializing...");
    Couple(descriptor);
    VERBOSE_AI("Initialized");
