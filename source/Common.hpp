@@ -23,54 +23,66 @@ struct Mind;
 
 #if 1
    #define VERBOSE_AI_ENABLED() 1
-
    #define VERBOSE_AI(...)               Logger::Verbose(Self(), __VA_ARGS__)
    #define VERBOSE_AI_TAB(...)           const auto tab = Logger::VerboseTab(Self(), __VA_ARGS__)
-                                         
+#else
+   #define VERBOSE_AI_ENABLED() 0
+   #define VERBOSE_AI(...)               LANGULUS(NOOP)
+   #define VERBOSE_AI_TAB(...)           LANGULUS(NOOP)
+#endif
+
+#if 1 and VERBOSE_AI_ENABLED()
    #define VERBOSE_AI_SEEK(...)          Logger::Verbose(Self(), __VA_ARGS__)
    #define VERBOSE_AI_SEEK_TAB(...)      const auto tab = Logger::VerboseTab(Self(), __VA_ARGS__)
-                                         
+#else
+   #define VERBOSE_AI_SEEK(...)          LANGULUS(NOOP)
+   #define VERBOSE_AI_SEEK_TAB(...)      LANGULUS(NOOP)
+#endif
+
+#if 1 and VERBOSE_AI_ENABLED()
    #define VERBOSE_AI_BUILD(...)         Logger::Verbose(Self(), __VA_ARGS__)
    #define VERBOSE_AI_BUILD_TAB(...)     const auto tab = Logger::VerboseTab(Self(), __VA_ARGS__)
-                                         
+#else
+   #define VERBOSE_AI_BUILD(...)         LANGULUS(NOOP)
+   #define VERBOSE_AI_BUILD_TAB(...)     LANGULUS(NOOP)
+#endif
+
+#if 1 and VERBOSE_AI_ENABLED()
    #define VERBOSE_AI_RESOLVE(...)       Logger::Verbose(Self(), __VA_ARGS__)
    #define VERBOSE_AI_RESOLVE_TAB(...)   const auto tab = Logger::VerboseTab(Self(), __VA_ARGS__)
-                                         
+#else
+   #define VERBOSE_AI_RESOLVE(...)       LANGULUS(NOOP)
+   #define VERBOSE_AI_RESOLVE_TAB(...)   LANGULUS(NOOP)
+#endif
+
+#if 1 and VERBOSE_AI_ENABLED()
    #define VERBOSE_AI_ASSEMBLE(...)      Logger::Verbose(Self(), __VA_ARGS__)
    #define VERBOSE_AI_ASSEMBLE_TAB(...)  const auto tab = Logger::VerboseTab(Self(), __VA_ARGS__)
-                                         
+#else
+   #define VERBOSE_AI_ASSEMBLE(...)      LANGULUS(NOOP)
+   #define VERBOSE_AI_ASSEMBLE_TAB(...)  LANGULUS(NOOP)
+#endif
+
+#if 1 and VERBOSE_AI_ENABLED()
    #define VERBOSE_AI_COLLECT(...)       Logger::Verbose(Self(), __VA_ARGS__)
    #define VERBOSE_AI_COLLECT_TAB(...)   const auto tab = Logger::VerboseTab(Self(), __VA_ARGS__)
-                                         
+#else
+   #define VERBOSE_AI_COLLECT(...)       LANGULUS(NOOP)
+   #define VERBOSE_AI_COLLECT_TAB(...)   LANGULUS(NOOP)
+#endif
+
+#if 1 and VERBOSE_AI_ENABLED()
    #define VERBOSE_AI_GATHER(...)        Logger::Verbose(Self(), __VA_ARGS__)
    #define VERBOSE_AI_GATHER_TAB(...)    const auto tab = Logger::VerboseTab(Self(), __VA_ARGS__)
-                                         
+#else
+   #define VERBOSE_AI_GATHER(...)        LANGULUS(NOOP)
+   #define VERBOSE_AI_GATHER_TAB(...)    LANGULUS(NOOP)
+#endif
+
+#if 0 and VERBOSE_AI_ENABLED()
    #define VERBOSE_AI_INTERPRET(...)     Logger::Verbose(Self(), __VA_ARGS__)
    #define VERBOSE_AI_INTERPRET_TAB(...) const auto tab = Logger::VerboseTab(Self(), __VA_ARGS__)
 #else
-   #define VERBOSE_AI_ENABLED() 0
-
-   #define VERBOSE_AI(...)               LANGULUS(NOOP)
-   #define VERBOSE_AI_TAB(...)           LANGULUS(NOOP)
-                                         
-   #define VERBOSE_AI_SEEK(...)          LANGULUS(NOOP)
-   #define VERBOSE_AI_SEEK_TAB(...)      LANGULUS(NOOP)
-
-   #define VERBOSE_AI_BUILD(...)         LANGULUS(NOOP)
-   #define VERBOSE_AI_BUILD_TAB(...)     LANGULUS(NOOP)
-
-   #define VERBOSE_AI_RESOLVE(...)       LANGULUS(NOOP)
-   #define VERBOSE_AI_RESOLVE_TAB(...)   LANGULUS(NOOP)
-
-   #define VERBOSE_AI_ASSEMBLE(...)      LANGULUS(NOOP)
-   #define VERBOSE_AI_ASSEMBLE_TAB(...)  LANGULUS(NOOP)
-
-   #define VERBOSE_AI_COLLECT(...)       LANGULUS(NOOP)
-   #define VERBOSE_AI_COLLECT_TAB(...)   LANGULUS(NOOP)
-
-   #define VERBOSE_AI_GATHER(...)        LANGULUS(NOOP)
-   #define VERBOSE_AI_GATHER_TAB(...)    LANGULUS(NOOP)
-
    #define VERBOSE_AI_INTERPRET(...)     LANGULUS(NOOP)
    #define VERBOSE_AI_INTERPRET_TAB(...) LANGULUS(NOOP)
 #endif

@@ -55,7 +55,9 @@ void Mind::Create(Verb& verb) {
 Many Mind::Interpret(const Text& text) {
    Text cloned = Clone(text);
    auto parsed = mOntology.Interpret(cloned);
-   VERBOSE_AI("Parsed `", cloned, "` into: ", parsed);
+   const auto tab = Logger::VerboseTab(Self(), Logger::Green,
+      "Parsed `", cloned, "` into: ");
+   Logger::Verbose(parsed);
    return {};
 }
 

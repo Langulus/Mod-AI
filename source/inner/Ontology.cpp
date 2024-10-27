@@ -20,6 +20,7 @@ Text Ontology::Self() const {
 /// Ideas have their own hierarchy and circular references, and need to be    
 /// teared down before we're able to reset them                               
 void Ontology::Teardown() {
+   mCache.Reset();
    mIdeas.Teardown();
 }
 
@@ -79,7 +80,7 @@ auto Ontology::Build(const Many& data, bool findMetapatterns) -> Idea* {
                ;
 
             // Then build an idea from the complex pattern hierarchy    
-            idea = Build(pattern);
+            idea = mIdeas.CreateOne(this, pattern);
          }
          else idea = BuildText(text);
 
@@ -89,7 +90,7 @@ auto Ontology::Build(const Many& data, bool findMetapatterns) -> Idea* {
    }
    else {
       // Anything else gets normalized conventionally using Neat        
-      return mIdeas.CreateOne(this, Neat {data});
+      return mIdeas.CreateOne(this, data);
    }
    
    // Combine all the generated ideas into one and return               
@@ -106,11 +107,11 @@ auto Ontology::Build(const Many& data, bool findMetapatterns) -> Idea* {
 
          // Then build an idea from the complex pattern hierarchy       
          if (metapatternsFound)
-            return mIdeas.CreateOne(this, Neat {pattern});
+            return mIdeas.CreateOne(this, pattern);
       }
 
       // Build an idea from the flat idea sequence                      
-      return mIdeas.CreateOne(this, Neat {coalesced});
+      return mIdeas.CreateOne(this, coalesced);
    }
 
    // If reached, then no idea was built (empty data?)                  
@@ -139,6 +140,41 @@ auto Ontology::BuildText(const Text& text) -> Idea* {
    return mIdeas.CreateOne(this, text);
 }
 
+/// Optimize a sequence, extracting sequential entries of the given type and  
+/// concatenating them and reappending them on the front, discarding the      
+/// original from the provided data. Here's an example for text:              
+/// (text1, (text2, idea)) -> (text1+text2, idea)                             
+///   @param data - the sequence to optimize                                  
+template<class FOR>
+void OptimizeFor(Many& data) {
+   if (data.IsOr())
+      return;
+
+   // Make sure FOR is concatenable (wrap it in a TMany if not)         
+   Conditional<CT::Block<FOR>, FOR, TMany<FOR>> concatenated;
+
+   data.template ForEachDeep<false, false>([&concatenated](Many& group) {
+      if (group.IsOr())
+         return Loop::Break;     // Abort on groups that branch         
+      else if (group.IsDeep())
+         return Loop::Continue;  // Just continue on otherwise deep     
+
+      if (group.template IsSimilar<FOR>()) {
+         // Consume any sequential data (even if deep)                  
+         auto& g = reinterpret_cast<TMany<FOR>&>(group);
+         for (auto& relevant : g)
+            concatenated += relevant;
+         return Loop::Discard;
+      }
+      else return Loop::Break;
+   });
+
+   if (data and concatenated)
+      data >> Abandon(concatenated);
+   else if (concatenated)
+      data = Abandon(concatenated);
+}
+
 /// Interpret some text                                                       
 ///   @param text - text to interpret                                         
 ///   @attention text is assumed lowercased!                                  
@@ -157,133 +193,48 @@ auto Ontology::Interpret(const Text& text) const -> Many {
    // context.                                                          
    Many result;
    for (Offset i = text.GetCount(); i > 0; --i) {
-      // There are text.GetCount() possible head patterns               
+      // There are text.GetCount() possible patterns                    
       Text token = text.Select(0, i);
       auto lower = token.Lowercase();
       
-      // Figure out the head pattern                                    
-      Many head;
+      // Figure out the pattern                                         
+      Many pattern;
       if (token == lower) {
          auto idea = mIdeas.Find(token);
-         if (idea)   head = idea;
-         else        head = token;
+         if (idea)   pattern = idea;
+         else        pattern = token;
       }
       else {
          auto idea1 = mIdeas.Find(token);
          auto idea2 = mIdeas.Find(lower);
          if (idea1 and idea2) {
-            head << idea1 << idea2;
-            head.MakeOr();
+            pattern << idea1 << idea2;
+            pattern.MakeOr();
          }
          else if (idea1) {
-            head << idea1;
+            pattern << idea1;
          }
          else if (idea2) {
-            head << token << idea2;
-            head.MakeOr();
+            pattern << token << idea2;
+            pattern.MakeOr();
          }
-         else head = token;
+         else pattern = token;
       }
-      VERBOSE_AI_INTERPRET("Head: ", head);
 
       if (i < text.GetCount()) {
          // Nest for the tail - optimize whenever possible by grouping  
          // similar data                                                
          auto tail = Interpret(text.Select(i));
-         VERBOSE_AI_INTERPRET("Tail: ", tail);
-
-         if (tail.IsSimilar(head) and not head.IsOr() and not tail.IsOr()) {
-            if (tail.Is<Text>()) {
-               // We can optimize further by concatenating texts        
-               Text concatenated;
-               head.ForEach([&concatenated](const Text& t) {
-                  concatenated += t;
-               });
-               tail.ForEach([&concatenated](const Text& t) {
-                  concatenated += t;
-               });
-
-               head = concatenated;
-            }
-            else head.InsertBlock(IndexBack, tail);
-         }
-         else {
-            if (head.Is<Text>() and not head.IsOr() and tail.IsDeep()) {
-               // Other optimization worthy cases, like:                
-               // (text1, (text2, idea)) -> (text1+text2, idea)         
-               Text concatenated;
-
-               // Concat all texts in head                              
-               head.ForEach([&concatenated](const Text& t) {
-                  concatenated += t;
-               });
-
-               // Concat all texts in tail (deeply)                     
-               tail.ForEachDeep<false, false>([&concatenated](Many& group) {
-                  if (group.IsDeep() and not group.IsOr()) {
-                     // Skip intermediate groups unless they branch     
-                     return Loop::Continue;
-                  }
-
-                  if (not group.Is<Text>() or group.IsOr()) {
-                     // Abort on type mismatch/branch                   
-                     return Loop::Break;
-                  }
-
-                  group.ForEach([&concatenated](const Text& t) {
-                     concatenated += t;
-                  });
-
-                  // Discard the group after being consumed from tail   
-                  return Loop::Discard;
-               });
-
-               head = concatenated;
-            }
-            else if (head.Is<Idea>() and not head.IsOr() and tail.IsDeep()) {
-               //TODO this can be generalized for any type i think
-               // Other optimization worthy cases, like:                
-               // (idea1, (idea2, idea3)) -> (idea1, idea2, idea3)      
-               Many concatenated;
-
-               // Concat all ideas in head                              
-               head.ForEach([&concatenated](Idea* t) {
-                  concatenated << t;
-               });
-
-               // Concat all ideas in tail (deeply)                     
-               tail.ForEachDeep<false, false>([&concatenated](Many& group) {
-                  if (group.IsDeep() and not group.IsOr()) {
-                     // Skip intermediate groups unless they branch     
-                     return Loop::Continue;
-                  }
-
-                  if (not group.Is<Idea>() or group.IsOr()) {
-                     // Abort on type mismatch/branch                   
-                     return Loop::Break;
-                  }
-
-                  group.ForEach([&concatenated](Idea* t) {
-                     concatenated << t;
-                  });
-
-                  // Discard the group after being consumed from tail   
-                  return Loop::Discard;
-               });
-
-               head = concatenated;
-            }
-            else {
-               // Can't optimize anything                               
-               head << tail;
-            }
-         }
+         pattern << Abandon(tail);
       }
       
-      // Push the interpretation, avoid duplicating                     
-      VERBOSE_AI_INTERPRET("Final: ", token, " -> ", head);
-      mCache.Insert(token, head);
-      result <<= head;
+      OptimizeFor<Text>(pattern);
+      OptimizeFor<Idea*>(pattern);
+
+      // Cache and merge the interpretation (avoids duplicating)        
+      VERBOSE_AI_INTERPRET("Final (optimized): ", text, " -> ", pattern);
+      mCache.Insert(text, pattern);
+      result <<= Abandon(pattern);
    }
 
    if (result.GetCount() > 1)
@@ -305,6 +256,7 @@ auto Ontology::Interpret(const Text& text) const -> Many {
    // Similar items in non-or sequences will be optimized and flattened 
    return result;
 }
+
 
 /// Seek for more complex patterns that have been registered in the ontology  
 /// and substitute until nothing remains. This when applied repeatedly        

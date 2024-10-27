@@ -21,14 +21,20 @@ int main(int, char**) {
    auto root = Thing::Root("AI");
 
    // Create the mind and build a common ontology for all demos         
+   // Let's prove how scalable this strategy really is ;)               
    auto mind = root.CreateUnit<A::Mind>();
    BuildOntology(root);
 
    // Pick a demo                                                       
-   Logger::Prompt("Pick a demo: ");
+   Logger::Prompt("Pick a demo from 1 to 24, or 0 for a free-talk session");
+   Logger::Prompt("See README.md file for information about the available demos");
+   Logger::Prompt("> ");
    int demoId = 0;
    std::cin >> demoId;
    switch (demoId) {
+   case 0:
+      Logger::Info("Free talk mode initiated (TODO)");
+      return 0;
    case 1:   Demo01(root); break;
    case 2:   Demo02(root); break;
    case 3:   Demo03(root); break;
@@ -53,7 +59,9 @@ int main(int, char**) {
    case 22:  Demo22(root); break;
    case 23:  Demo23(root); break;
    case 24:  Demo24(root); break;
-   default:  return 0;
+   default:
+      Logger::Info("No such demo. Shutting down...");
+      return 0;
    }
 
    // Loop until quit                                                   
