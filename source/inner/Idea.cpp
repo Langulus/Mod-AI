@@ -7,6 +7,7 @@
 ///                                                                           
 #include "Idea.hpp"
 #include "Ontology.hpp"
+#include <cstring>
 
 
 /// Constructor                                                               
@@ -228,5 +229,23 @@ Text Idea::Self() const {
 
 /// Convert an Idea to Text                                                   
 Idea::operator Text() const {
+   if (mDescriptor.Is<Text>() and mDescriptor.GetCount() == 1) {
+      // Write a more meaningful representation                         
+      auto& token = mDescriptor.Get<Text>();
+      bool contains_symbols = false;
+      for (auto c : token) {
+         if (not ::std::isalpha(c)) {
+            contains_symbols = true;
+            break;
+         }
+      }
+
+      if (not contains_symbols)
+         return "##" + token;
+      else
+         return "##`" + token + "`";
+   }
+
+   // Write the identity if idea is complex                             
    return IdentityOf("Idea", this);
 }

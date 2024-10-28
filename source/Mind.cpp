@@ -54,10 +54,10 @@ void Mind::Create(Verb& verb) {
 ///   @return the interpreted message                                         
 Many Mind::Interpret(const Text& text) {
    Text cloned = Clone(text);
-   auto parsed = mOntology.Interpret(cloned);
+   auto interpretations = mOntology.Interpret(cloned);
    const auto tab = Logger::VerboseTab(Self(), Logger::Green,
-      "Parsed `", cloned, "` into: ");
-   Logger::Verbose(parsed);
+      "Interpreted `", cloned, "` into: ");
+   DumpPatterns(interpretations);
    return {};
 }
 
@@ -68,4 +68,24 @@ bool Mind::Update(Time deltaTime) {
    //TODO don't increment time if passed out
    mLifetime += deltaTime;
    return false;
+}
+
+/// Log the contents of a pattern in a pretty way                             
+///   @param data - the pattern to log                                        
+void Mind::DumpPatterns(const Many& data) {
+   if (data.IsDeep() and data.IsOr()) {
+      // Display a range of alternatives                                
+      bool first = true;
+      data.ForEach([&](const Many& group) {
+         const auto tab = Logger::VerboseTab(Logger::PushDarkYellow,
+            first ? "" : "or ", Logger::Pop);
+         DumpPatterns(group);
+         first = false;
+      });
+
+      return;
+   }
+
+   // Flat if reached                                                   
+   Logger::Verbose(data);
 }

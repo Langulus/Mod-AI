@@ -46,6 +46,8 @@ private:
    // Societies this mind is part of                                    
    TMany<Society*> mSocieties;
 
+   static void DumpPatterns(const Many&);
+
 public:
    Mind(AI*, const Many&);
 
