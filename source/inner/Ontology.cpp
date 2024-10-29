@@ -177,9 +177,11 @@ void OptimizeFor(Many& data) {
 
 /// Interpret some text                                                       
 ///   @param text - text to interpret                                         
-///   @attention text is assumed lowercased!                                  
 ///   @return the hierarchy of ideas in the text                              
 auto Ontology::Interpret(const Text& text) const -> Many {
+   if (text.IsEmpty())
+      return {};
+
    // Is the text available in the cache? Directly return it if so      
    VERBOSE_AI_INTERPRET_TAB("Interpreting: ", text);
    const auto cached = mCache.FindIt(text);
@@ -193,12 +195,14 @@ auto Ontology::Interpret(const Text& text) const -> Many {
    // context.                                                          
    Many result;
    for (Offset i = text.GetCount(); i > 0; --i) {
-      // There are text.GetCount() possible patterns                    
+      // There are text.GetCount() possible interpretations - all       
+      // collected in this 'or' container.                              
+      Many pattern;
+
       Text token = text.Select(0, i);
       auto lower = token.Lowercase();
       
       // Figure out the pattern                                         
-      Many pattern;
       if (token == lower) {
          auto idea = mIdeas.Find(token);
          if (idea)   pattern = idea;
