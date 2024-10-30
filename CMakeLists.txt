@@ -17,5 +17,6 @@ add_langulus_mod(LangulusModAI ${LANGULUS_MOD_AI_SOURCES})
 if(LANGULUS_TESTING)
     enable_testing()
     add_subdirectory(test)
-    add_subdirectory(demo)
 endif()
+
+add_subdirectory(demo)
