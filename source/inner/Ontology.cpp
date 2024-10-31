@@ -162,7 +162,7 @@ void OptimizeFor(Many& data) {
       if (group.template IsSimilar<FOR>()) {
          // Consume any sequential data (even if deep)                  
          auto& g = reinterpret_cast<TMany<FOR>&>(group);
-         for (auto& relevant : g)
+         for (const auto& relevant : g)
             concatenated += relevant;
          return Loop::Discard;
       }
