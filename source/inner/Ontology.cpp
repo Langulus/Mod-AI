@@ -234,11 +234,25 @@ auto Ontology::Interpret(const Text& text) const -> Many {
       
       OptimizeFor<Text>(pattern);
       OptimizeFor<Idea*>(pattern);
+      pattern.Optimize();
 
-      // Cache and merge the interpretation (avoids duplicating)        
+      // Cache and merge the interpretation                             
+      VERBOSE_AI_INTERPRET("Final (previous): ", text, " -> ", result);
       VERBOSE_AI_INTERPRET("Final (optimized): ", text, " -> ", pattern);
       mCache.Insert(text, pattern);
-      result <<= Abandon(pattern);
+      
+      // Avoid duplication                                              
+      bool found = false;
+      result.ForEachDeep<false, false>([&](const Many& group) {
+         if (group == pattern) {
+            found = true;
+            return Loop::Break;
+         }
+         return Loop::Continue;
+      });
+
+      if (not found)
+         result << Abandon(pattern);
    }
 
    if (result.GetCount() > 1)

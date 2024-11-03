@@ -16,9 +16,10 @@
 ///                                                                           
 void Demo01(Thing& root) {
    auto ms = root.CreateChild("Demo01");
-   ms->Say("hi, my name is Dimo");
-   ms->Say("let's make a game called Test Game");
-   ms->Say("create a grid");
-   ms->Say("create a universe");
-   ms->Say("let me control the camera with mouse WSAD, space and left control");
+   ms->Say("is Dimo");
+   //ms->Say("hi, my name is Dimo");
+   //ms->Say("let's make a game called Test Game");
+   //ms->Say("create a grid");
+   //ms->Say("create a universe");
+   //ms->Say("let me control the camera with mouse WSAD, space and left control");
 }
