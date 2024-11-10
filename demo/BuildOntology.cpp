@@ -14,7 +14,8 @@
 void BuildOntology(Thing& root) {
    root.LoadMod("AssetsGeometry");
 
-   root.Run("##plural         = { ?? * ((number? > 1) or Range(1, +infinity)) }");
+   //root.Run("##plural         = { ?? * ((number? > 1) or Range(1, +infinity)) }");
+   root.Run("##` `");
    root.Run("##hi             = { thing? create user }");
    root.Run("##`,`            = { ? conjunct!2 ?? }");
    root.Run("##me             = { ?.user }");

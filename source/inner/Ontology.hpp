@@ -21,7 +21,12 @@ private:
    // combinations in a prompt is costly - use that as an optimization  
    mutable TUnorderedMap<Text, Many> mCache;
 
+   Count mLongestKnownText = 0;
+
    Text Self() const;
+
+   template<class FOR>
+   void OptimizeFor(Many&) const;
 
 public:
    Ontology(const A::AIUnit&);
@@ -31,6 +36,6 @@ public:
    auto Build(const Many&, bool findMetapatterns = true) -> Idea*;
    auto BuildText(const Text&) -> Idea*;
    auto Interpret(const Text&) const -> Many;
-   bool FindMetapatterns(Many&) const;
+   //bool FindMetapatterns(Many&) const;
    void Teardown();
 };

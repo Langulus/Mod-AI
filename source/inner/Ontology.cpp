@@ -73,7 +73,7 @@ auto Ontology::Build(const Many& data, bool findMetapatterns) -> Idea* {
       data.ForEach([&](const Text& text) {
          Idea* idea;
 
-         if (findMetapatterns) {
+         /*if (findMetapatterns) { //TODO use nested Interpet instead - should be more generic
             // Interpret the text and find all possible metapatterns    
             auto pattern = Interpret(text);
             while (FindMetapatterns(pattern))
@@ -82,7 +82,7 @@ auto Ontology::Build(const Many& data, bool findMetapatterns) -> Idea* {
             // Then build an idea from the complex pattern hierarchy    
             idea = mIdeas.CreateOne(this, pattern);
          }
-         else idea = BuildText(text);
+         else*/ idea = BuildText(text);
 
          if (idea)
             coalesced << idea;
@@ -98,7 +98,7 @@ auto Ontology::Build(const Many& data, bool findMetapatterns) -> Idea* {
       if (coalesced.GetCount() == 1)
          return coalesced[0];
 
-      if (findMetapatterns) {
+      /*if (findMetapatterns) { //TODO use nested Interpet instead - should be more generic
          // Find all possible metapatterns                              
          Many pattern = coalesced;
          bool metapatternsFound = false;
@@ -108,7 +108,7 @@ auto Ontology::Build(const Many& data, bool findMetapatterns) -> Idea* {
          // Then build an idea from the complex pattern hierarchy       
          if (metapatternsFound)
             return mIdeas.CreateOne(this, pattern);
-      }
+      }*/
 
       // Build an idea from the flat idea sequence                      
       return mIdeas.CreateOne(this, coalesced);
@@ -122,6 +122,10 @@ auto Ontology::Build(const Many& data, bool findMetapatterns) -> Idea* {
 ///   @param text - pattern to build idea for                                 
 ///   @return the idea representing the text                                  
 auto Ontology::BuildText(const Text& text) -> Idea* {
+   // Keep track of the longest known text pattern                      
+   if (text.GetCount() > mLongestKnownText)
+      mLongestKnownText = text.GetCount();
+
    // Everytime we build a text pattern, build a sanitized variant      
    // (no capital letters) and link it as an association implicitly.    
    //TODO sanitize away invalid symbols?
@@ -146,7 +150,7 @@ auto Ontology::BuildText(const Text& text) -> Idea* {
 /// (text1, (text2, idea)) -> (text1+text2, idea)                             
 ///   @param data - the sequence to optimize                                  
 template<class FOR>
-void OptimizeFor(Many& data) {
+void Ontology::OptimizeFor(Many& data) const {
    if (data.IsOr())
       return;
 
@@ -168,6 +172,15 @@ void OptimizeFor(Many& data) {
       }
       else return Loop::Break;
    });
+
+   if constexpr (CT::Text<FOR>) {
+      // Interpret the concatenated text again                          
+      auto idea = mIdeas.Find(concatenated);
+      if (idea) {
+         data >> idea;
+         return;
+      }
+   }
 
    if (data and concatenated)
       data >> Abandon(concatenated);
@@ -194,19 +207,16 @@ auto Ontology::Interpret(const Text& text) const -> Many {
    // ations may overlap, and are later weighted and filtered by        
    // context.                                                          
    Many result;
-   for (Offset i = text.GetCount(); i > 0; --i) {
-      // There are text.GetCount() possible interpretations - all       
-      // collected in this 'or' container.                              
+   for (Offset i = 1; i <= text.GetCount(); ++i) {
       Many pattern;
-
       Text token = text.Select(0, i);
       auto lower = token.Lowercase();
       
       // Figure out the pattern                                         
       if (token == lower) {
          auto idea = mIdeas.Find(token);
-         if (idea)   pattern = idea;
-         else        pattern = token;
+         if (idea)
+            pattern = idea;
       }
       else {
          auto idea1 = mIdeas.Find(token);
@@ -222,19 +232,26 @@ auto Ontology::Interpret(const Text& text) const -> Many {
             pattern << token << idea2;
             pattern.MakeOr();
          }
-         else pattern = token;
       }
 
+      if (not pattern and i != 1)
+         continue;
+
+      if (not pattern)
+         pattern << token;
+
+      // If an idea was found, than this is a worthy pattern            
+      // Otherwise we push it ONLY if token is the smallest             
+      // Nest for the tail - optimize whenever possible by grouping     
+      // similar data                                                   
       if (i < text.GetCount()) {
-         // Nest for the tail - optimize whenever possible by grouping  
-         // similar data                                                
          auto tail = Interpret(text.Select(i));
          pattern << Abandon(tail);
+
+         OptimizeFor<Text>(pattern);
+         OptimizeFor<Idea*>(pattern);
+         pattern.Optimize(); //TODO remove this when auto-optimization starts to happen properly on Loop::Discard
       }
-      
-      OptimizeFor<Text>(pattern);
-      OptimizeFor<Idea*>(pattern);
-      pattern.Optimize();
 
       // Cache and merge the interpretation                             
       VERBOSE_AI_INTERPRET("Final (previous): ", text, " -> ", result);
@@ -251,27 +268,16 @@ auto Ontology::Interpret(const Text& text) const -> Many {
          return Loop::Continue;
       });
 
-      if (not found)
-         result << Abandon(pattern);
+      if (not found) {
+         // Push to front, because each new subtoken is longer          
+         // and thus more likely to be the best one                     
+         result >> Abandon(pattern);
+      }
+      else VERBOSE_AI_INTERPRET(Logger::Red, "Discarded: ", pattern);
    }
 
    if (result.GetCount() > 1)
       result.MakeOr();
-
-   // This is how 'result' should look like at this point:              
-   //    [0]: TEXT                                                      
-   // or [1]: TEX, T                                                    
-   // or [2]: TE, XT                                                    
-   //         [0]: TE, XT                                               
-   //      or [1]: TE, X, T                                             
-   // or [3]: T, EXT                                                    
-   //         [0]: T, EXT                                               
-   //      or [1]: T, EX, T                                             
-   //      or [2]: T, E, XT                                             
-   //              [0]: T, E, XT                                        
-   //           or [1]: T, E, X, T                                      
-   //                                                                   
-   // Similar items in non-or sequences will be optimized and flattened 
    return result;
 }
 
@@ -284,13 +290,13 @@ auto Ontology::Interpret(const Text& text) const -> Many {
 /// and the only way to restore it is by using deeper and deeper ideas.       
 ///   @param data - [in/out] the patterns to scan                             
 ///   @return true if at least one pattern was found inside 'data'            
-bool Ontology::FindMetapatterns(Many& data) const {
+/*bool Ontology::FindMetapatterns(Many& data) const {
    bool atLeastOneMetapatternFound = false;
 
    data.ForEachDeep([&](Many& group) {
       for (Offset i = group.GetCount(); i > 1; --i) {
          auto pattern = group.Select(0, i);
-         auto idea = mIdeas.Find(Neat {pattern});
+         auto idea = mIdeas.Find(pattern);
          if (not idea)
             continue;
          
@@ -319,4 +325,4 @@ bool Ontology::FindMetapatterns(Many& data) const {
 
    //TODO must flatten ideas wherever possible
    return atLeastOneMetapatternFound;
-}
+}*/

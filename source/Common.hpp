@@ -79,7 +79,7 @@ struct Mind;
    #define VERBOSE_AI_GATHER_TAB(...)    LANGULUS(NOOP)
 #endif
 
-#if 1 and VERBOSE_AI_ENABLED()
+#if 0 and VERBOSE_AI_ENABLED()
    #define VERBOSE_AI_INTERPRET(...)     Logger::Verbose(Self(), __VA_ARGS__)
    #define VERBOSE_AI_INTERPRET_TAB(...) const auto tab = Logger::VerboseTab(Self(), __VA_ARGS__)
 #else
