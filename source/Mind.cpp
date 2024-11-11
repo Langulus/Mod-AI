@@ -57,6 +57,7 @@ Many Mind::Interpret(const Text& text) {
    auto interpretations = mOntology.Interpret(cloned);
    const auto tab = Logger::VerboseTab(Self(), Logger::Green,
       "Interpreted `", cloned, "` into: ");
+   Logger::VerboseTab("");
    DumpPatterns(interpretations);
    return {};
 }
@@ -73,19 +74,41 @@ bool Mind::Update(Time deltaTime) {
 /// Log the contents of a pattern in a pretty way                             
 ///   @param data - the pattern to log                                        
 void Mind::DumpPatterns(const Many& data) {
-   if (data.IsDeep() and data.IsOr()) {
-      // Display a range of alternatives                                
+   if (data.IsDeep()) {
       bool first = true;
-      data.ForEach([&](const Many& group) {
-         const auto tab = Logger::VerboseTab(Logger::PushDarkYellow,
-            first ? "" : "or ", Logger::Pop);
-         DumpPatterns(group);
-         first = false;
-      });
+
+      if (data.IsOr()) {
+         // Display a range of alternatives                             
+         data.ForEach([&](const Many& group) {
+            if (not first)
+               Logger::Verbose(Logger::PushDarkYellow, "or ", Logger::Pop);
+            else 
+               Logger::Verbose("   ");
+            Logger::Append(Logger::Tab);
+            DumpPatterns(group);
+            Logger::Append(Logger::Untab);
+            first = false;
+         });
+      }
+      else {
+         // Display a range of sequentials                              
+         data.ForEach([&](const Many& group) {
+            if (not first)
+               Logger::Append(", ");
+            DumpPatterns(group);
+            first = false;
+         });
+      }
 
       return;
    }
 
    // Flat if reached                                                   
-   Logger::Verbose(data);
+   if (data.Is<Idea>())
+      Logger::Append(Logger::PushCyan);
+
+   Logger::Append(data);
+
+   if (data.Is<Idea>())
+      Logger::Append(Logger::Pop);
 }
