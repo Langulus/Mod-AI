@@ -57,9 +57,9 @@ Many Mind::Interpret(const Text& text) {
    auto interpretations = mOntology.Interpret(cloned);
    const auto tab = Logger::VerboseTab(Self(), Logger::Green,
       "Interpreted `", cloned, "` into: ");
-   Logger::VerboseTab("");
+   Logger::Verbose("");
    DumpPatterns(interpretations);
-   return {};
+   return interpretations;
 }
 
 /// Mind update routine                                                       

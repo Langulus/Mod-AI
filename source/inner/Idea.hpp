@@ -23,9 +23,13 @@ using Rating  = Real;
 ///   An idea                                                                 
 ///                                                                           
 struct Idea : Referenced, ProducedFrom<Ontology> {
-   LANGULUS_CONVERTS_TO(Text);
    LANGULUS(PRODUCER) Ontology;
-   LANGULUS_VERBS(Verbs::Equal, Verbs::Associate);
+   LANGULUS_CONVERTS_TO(Text);
+   LANGULUS_VERBS(
+      Verbs::Equal,
+      Verbs::Associate,
+      Verbs::Interpret
+   );
 
 protected:
    friend struct Ontology;
@@ -48,6 +52,7 @@ public:
    auto GetOntology() const -> Ontology*;
    void Associate(Verb&);
    void Equal(Verb&) const;
+   void Interpret(Verb&) const;
 
    bool operator > (const Idea&) const noexcept;
    bool operator < (const Idea&) const noexcept;

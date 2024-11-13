@@ -249,3 +249,10 @@ Idea::operator Text() const {
    // Write the identity if idea is complex                             
    return IdentityOf("Idea", this);
 }
+
+/// Interpret the idea as something - useful to extract specific data from    
+/// an Idea - extensively used when linking flows                             
+///   @param verb - the interpretation verb                                   
+void Idea::Interpret(Verb&) const {
+   TODO();
+}
