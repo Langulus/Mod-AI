@@ -1,5 +1,4 @@
 #include "Ontology.hpp"
-#include "Pattern.hpp"
 
 
 /// Default ontology constructor                                              
