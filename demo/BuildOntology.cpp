@@ -19,7 +19,7 @@ void BuildOntology(Thing& root) {
    root.Run("##hi             = { thing? create user }");
    root.Run("##`,`            = { ? conjunct!2 ?? }");
    root.Run("##me             = { ?.user }");
-   root.Run("##my             = { ##me.?? }");
+   root.Run("##my             = { ##me().?? }");
    root.Run("##I              = ##me");
    root.Run("##name           = name");
    root.Run("##is             = { ? = ?? }");

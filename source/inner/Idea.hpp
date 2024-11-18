@@ -8,8 +8,10 @@
 #pragma once
 #include "../Common.hpp"
 #include <Anyness/TSet.hpp>
+#include <Flow/Verbs/Do.hpp>
 #include <Flow/Verbs/Associate.hpp>
 #include <Flow/Verbs/Equal.hpp>
+#include <Flow/Verbs/Interpret.hpp>
 
 struct Idea;
 struct Ontology;
@@ -48,11 +50,22 @@ public:
    Idea(const Idea&) = delete;
    Idea(Idea&&) = delete;
 
-   void Teardown();
-   auto GetOntology() const -> Ontology*;
    void Associate(Verb&);
    void Equal(Verb&) const;
    void Interpret(Verb&) const;
+
+   void Teardown();
+   auto GetOntology() const->Ontology*;
+   explicit operator Text() const;
+
+   /// Extract a specific type from all idea associations                     
+   ///   @tparam T - the type to seek for                                     
+   ///   @return the hierarchy of the selected type                           
+   template<CT::Flat T>
+   Many Extract() const {
+      IdeaSet mask;
+      return ExtractInner(MetaDataOf<T>(), mask);
+   }
 
    bool operator > (const Idea&) const noexcept;
    bool operator < (const Idea&) const noexcept;
@@ -66,14 +79,14 @@ public:
    void Associate          (Idea*);
    void Disassociate       (Idea*);
 
-   explicit operator Text() const;
-
 private:
    template<bool ASSOCIATE>
    bool LinkIdea(Idea*);
    template<bool ASSOCIATE>
    void AssociateInner(Verb&);
    auto AdvancedCompare(const Idea*, IdeaSet&) const -> const Idea*;
+   Many ExtractInner(DMeta, IdeaSet&) const;
+   Many ExtractInnerInner(DMeta, const Many&) const;
    Text Self() const;
    void Link(Idea*, Ideas&);
 };

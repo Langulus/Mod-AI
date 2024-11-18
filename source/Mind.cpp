@@ -54,12 +54,16 @@ void Mind::Create(Verb& verb) {
 ///   @return the interpreted message                                         
 Many Mind::Interpret(const Text& text) {
    Text cloned = Clone(text);
+
+   // Find combinations of ideas                                        
    auto interpretations = mOntology.Interpret(cloned);
    const auto tab = Logger::VerboseTab(Self(), Logger::Green,
       "Interpreted `", cloned, "` into: ");
    Logger::Verbose("");
    DumpPatterns(interpretations);
-   return interpretations;
+
+   // Convert those ideas into actions                                  
+   return Compile(interpretations);
 }
 
 /// Mind update routine                                                       
@@ -83,7 +87,7 @@ void Mind::DumpPatterns(const Many& data) {
             if (not first)
                Logger::Verbose(Logger::PushDarkYellow, "or ", Logger::Pop);
             else 
-               Logger::Verbose("   ");
+               Logger::Verbose("|  ");
             Logger::Append(Logger::Tab);
             DumpPatterns(group);
             Logger::Append(Logger::Untab);
@@ -111,4 +115,60 @@ void Mind::DumpPatterns(const Many& data) {
 
    if (data.Is<Idea>())
       Logger::Append(Logger::Pop);
+}
+
+/// Compile iterpretations into a temporal flow                               
+///   @param data - the interpretations to convert to actions                 
+///   @param output - [in/out] the resulting flow                             
+Many Mind::Compile(const Many& data) const {
+   Many scope;
+
+   if (data.IsDeep()) {
+      // Nest compilation. No escape from this branch                   
+      if (data.IsOr()) {
+         data.ForEach([&](const Many& group) {
+            scope <<= Compile(group);
+         });
+
+         if (scope.GetCount() > 1)
+            scope.MakeOr();
+      }
+      else {
+         data.ForEach([&](const Many& group) {
+            scope << Compile(group);
+         });
+      }
+
+      return scope;
+   }
+
+   // Flat if reached                                                   
+   if (data.IsSimilar<Idea*>()) {
+      // Push ideas by extracting verbs from them                       
+      // If no verbs were available, just push the idea itself - it can 
+      // later by interpreted to sought data on demand                  
+      auto& ideas = reinterpret_cast<const TMany<const Idea*>&>(data);
+
+      if (data.IsOr()) {
+         // If ideas are mutually exclusive, collect all branches and   
+         // push them together into the flow                            
+         for (auto idea : ideas) {
+            auto verbs = idea->Extract<Verb>();
+            if (verbs)  scope <<= verbs;
+            else        scope <<= idea;
+         }
+
+         if (scope.GetCount() > 1)
+            scope.MakeOr();
+      }
+      else for (auto idea : ideas) {
+         // Push verbs if any were available, otherwise push ideas      
+         auto verbs = idea->Extract<Verb>();
+         if (verbs)  scope << verbs;
+         else        scope << idea;
+      }
+   }
+   else scope = data;
+
+   return scope;
 }

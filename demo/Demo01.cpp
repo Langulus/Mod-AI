@@ -16,6 +16,7 @@
 ///                                                                           
 void Demo01(Thing& root) {
    auto ms = root.CreateChild("Demo01");
+   ms->LoadMod("UMS");
    ms->Say("hi, my name is Dimo");
    /*ms->Say("let's make a game called Test Game");
    ms->Say("create a grid");

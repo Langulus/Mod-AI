@@ -58,7 +58,7 @@ auto Ontology::Build(const Many& data, bool findMetapatterns) -> Idea* {
       });
    }
    else if (data.Is<Code>()) {
-      // Code needs to be normalized further, by compiling it. Can't    
+      // Code needs to be normalized further by compiling it. Can't     
       // just register it as it is - spaces, cases and optional brackets
       // will produce different hashes and overcomplicate the database. 
       data.ForEach([&](const Code& code) {

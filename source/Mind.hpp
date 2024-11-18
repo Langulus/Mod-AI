@@ -47,6 +47,7 @@ private:
    TMany<Society*> mSocieties;
 
    static void DumpPatterns(const Many&);
+   Many Compile(const Many&) const;
 
 public:
    Mind(AI*, const Many&);

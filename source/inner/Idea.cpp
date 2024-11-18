@@ -149,6 +149,7 @@ auto Idea::AdvancedCompare(const Idea* what, IdeaSet& mask) const -> const Idea*
       if (idea == what)
          return nullptr;
    }
+
    for (auto idea : what->mDisassociations) {
       if (idea == this)
          return nullptr;
@@ -246,7 +247,7 @@ Idea::operator Text() const {
          return "##`" + token + "`";
    }
 
-   // Write the identity if idea is complex                             
+   // Write the identity if idea is too complex                         
    return IdentityOf("Idea", this);
 }
 
@@ -255,4 +256,59 @@ Idea::operator Text() const {
 ///   @param verb - the interpretation verb                                   
 void Idea::Interpret(Verb&) const {
    TODO();
+}
+
+/// Iterates through all nested associations and disassociations in search    
+/// for data of specific type. The name of the game is: find if we can walk   
+/// from this idea to an instance of T, without hitting any disassociation on 
+/// the way. The hierarchy of all contained instances of T will be preserved. 
+///   @param what - the data type to search for                               
+///   @param mask - a set of covered ideas to avoid infinite regresses        
+///   @return the extracted hierarchy of instances of T                       
+Many Idea::ExtractInner(DMeta what, IdeaSet& mask) const {
+   if (mask.Contains(this))
+      return {};
+   mask << this;
+
+   // Extract the hierarchy of relevant data in the idea's descriptor   
+   auto result = ExtractInnerInner(what, mDescriptor);
+
+   // Make sure nothing is extracted from disassociations               
+   for (auto idea : mDisassociations)
+      mask << idea;
+
+   // Check if any relevant data is found in any associations           
+   for (auto idea : mAssociations) {
+      auto deeper = idea->ExtractInner(what, mask);
+      if (deeper)
+         result <<= deeper;
+   }
+
+   return result;
+}
+
+///TODO move this to Block::Distill?                                          
+Many Idea::ExtractInnerInner(DMeta what, const Many& data) const {
+   if (data.IsDeep()) {
+      // Nest compilation. No escape from this branch                   
+      Many scope;
+      if (data.IsOr()) {
+         data.ForEach([&](const Many& group) {
+            scope <<= ExtractInnerInner(what, group);
+         });
+
+         if (scope.GetCount() > 1)
+            scope.MakeOr();
+      }
+      else {
+         data.ForEach([&](const Many& group) {
+            scope << ExtractInnerInner(what, group);
+         });
+      }
+
+      return scope;
+   }
+
+   // Flat if reached                                                   
+   return data.CastsToMeta(what) ? data : Many {};
 }
