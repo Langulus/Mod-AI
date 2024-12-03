@@ -1,6 +1,8 @@
 #pragma once
 #include "Idea.hpp"
 #include <Flow/Verbs/Associate.hpp>
+#include <Flow/Verbs/Create.hpp>
+#include <Flow/Verbs/Select.hpp>
 #include <Flow/Factory.hpp>
 
 
@@ -8,7 +10,7 @@
 ///   An ontology                                                             
 ///                                                                           
 struct Ontology {
-   LANGULUS_VERBS(Verbs::Create);
+   LANGULUS_VERBS(Verbs::Create, Verbs::Select);
 
 private:
    // The owning component                                              
@@ -33,6 +35,8 @@ public:
    Ontology(const A::AIUnit&, const Many&);
 
    void Create(Verb&);
+   void Select(Verb&);
+
    auto Build(const Many&, bool findMetapatterns = true) -> Idea*;
    auto BuildText(const Text&) -> Idea*;
    auto Interpret(const Text&) const -> Many;

@@ -17,6 +17,9 @@ LANGULUS_RTTI_BOUNDARY(RTTI::MainBoundary)
 
 
 int main(int, char**) {
+   Logger::ToHTML logFile {"ai-demo.htm"};
+   Logger::AttachDuplicator(&logFile);
+
    // Create root entity                                                
    auto root = Thing::Root("AI");
 
@@ -69,5 +72,6 @@ int main(int, char**) {
    while (root.Update(fps.GetDeltaTime()))
       fps.Tick();
 
+   Logger::DettachDuplicator(&logFile);
    return 0;
 }

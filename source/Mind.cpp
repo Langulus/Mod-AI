@@ -39,14 +39,11 @@ void Mind::Do(Verb& verb) {
    mHistory[mLifetime] << verb;
 
    // Dispatch                                                          
-   if (verb.template IsVerb<Verbs::Create>())
-      Create(verb);
-}
-
-/// A mind can produce/reuse/destroy ideas                                    
-///   @param verb - creation verb                                             
-void Mind::Create(Verb& verb) {
-   mOntology.Create(verb);
+   if (verb.template IsVerb<Verbs::Create>()
+   or (verb.template IsVerb<Verbs::Select>() and verb.GetMass() > 0)) {
+      // For minds, 'select' is isomorphic to 'create' when positive    
+      mOntology.Create(verb);
+   }
 }
 
 /// Interpret text                                                            

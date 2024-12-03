@@ -254,8 +254,9 @@ Idea::operator Text() const {
 /// Interpret the idea as something - useful to extract specific data from    
 /// an Idea - extensively used when linking flows                             
 ///   @param verb - the interpretation verb                                   
-void Idea::Interpret(Verb&) const {
-   TODO();
+void Idea::Interpret(Verb& verb) const {
+   Logger::Verbose("Interpreting ", *this, " as ", verb.GetArgument());
+   //TODO();
 }
 
 /// Iterates through all nested associations and disassociations in search    

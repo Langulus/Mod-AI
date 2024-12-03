@@ -8,7 +8,6 @@
 #pragma once
 #include "inner/Ontology.hpp"
 #include <Flow/Verbs/Do.hpp>
-#include <Flow/Verbs/Create.hpp>
 #include <Anyness/TMap.hpp>
 
 using History = TOrderedMap<Time, Many>;
@@ -24,7 +23,7 @@ struct Mind final : A::Mind, ProducedFrom<AI> {
    LANGULUS(ABSTRACT) false;
    LANGULUS(PRODUCER) AI;
    LANGULUS_BASES(A::Mind);
-   LANGULUS_VERBS(Verbs::Do, Verbs::Create);
+   LANGULUS_VERBS(Verbs::Do);
 
 private:
    // The mind's lifetime counter                                       
@@ -53,7 +52,6 @@ public:
    Mind(AI*, const Many&);
 
    void Do(Verb&);
-   void Create(Verb&);
 
    Many Interpret(const Text&);
    bool Update(Time);

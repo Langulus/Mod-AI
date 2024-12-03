@@ -19,7 +19,7 @@ void BuildOntology(Thing& root) {
    root.Run("##hi             = { thing? create user }");
    root.Run("##`,`            = { ? conjunct!2 ?? }");
    root.Run("##me             = { ?.user }");
-   root.Run("##my             = { ##me().?? }");
+   root.Run("##my             = { ##me().tmeta?? }");
    root.Run("##I              = ##me");
    root.Run("##name           = name");
    root.Run("##is             = { ? = ?? }");
@@ -28,7 +28,7 @@ void BuildOntology(Thing& root) {
    root.Run("##a              = ##(1)");
    //root.Run("##new            = "); // how do we define new??
    root.Run("##game           = (window, renderer, world)");
-   root.Run("##called         = name(text??)");
+   root.Run("##called         = { name(text??) }");
    root.Run("##create         = ##make");
    root.Run("##place          = ##make");
    root.Run("##generate       = ##make");
@@ -93,7 +93,7 @@ void BuildOntology(Thing& root) {
    root.Run("##at             = Ranges::On");
    root.Run("##center         = Ranges::Center");
    root.Run("##behind         = Ranges::Behind");
-   root.Run("##of             = ");
+   /*root.Run("##of             = ");
    root.Run("##to             = ");
    root.Run("##it             = ");
    root.Run("##randomly       = ");
@@ -132,6 +132,6 @@ void BuildOntology(Thing& root) {
    root.Run("##lose           = ");
    root.Run("##win            = ");
    root.Run("##have           = ");
-   root.Run("##single         = ");
+   root.Run("##single         = ");*/
    root.Run("##`'s`           = (##is or ##us or ##has)");
 }

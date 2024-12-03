@@ -29,6 +29,13 @@ void Ontology::Create(Verb& verb) {
    mIdeas.Create(this, verb);
 }
 
+/// Select is isomorphic to create when positive                              
+///   @param verb - the verb                                                  
+void Ontology::Select(Verb& verb) {
+   if (verb.GetMass() > 0)
+      Create(verb);
+}
+
 /// Build an idea representing a hierarchy                                    
 ///   @param data - the hierarchy to represent                                
 ///   @param findMetapatterns - search for all metapatterns before building   
