@@ -255,8 +255,14 @@ Idea::operator Text() const {
 /// an Idea - extensively used when linking flows                             
 ///   @param verb - the interpretation verb                                   
 void Idea::Interpret(Verb& verb) const {
-   Logger::Verbose("Interpreting ", *this, " as ", verb.GetArgument());
-   //TODO();
+   verb.ForEachDeep([&](DMeta type) {
+      IdeaSet mask;
+      auto found = ExtractInner(type, mask);
+      if (found) {
+         Logger::Verbose(Logger::Green, "Interpreted ", *this, " as ", found);
+         verb << Abandon(found);
+      }
+   });
 }
 
 /// Iterates through all nested associations and disassociations in search    
