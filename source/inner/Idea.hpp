@@ -70,8 +70,8 @@ public:
    bool operator > (const Idea&) const noexcept;
    bool operator < (const Idea&) const noexcept;
 
-   NOD() auto GetAssociations()    const noexcept -> const Ideas&;
-   NOD() auto GetDisassociations() const noexcept -> const Ideas&;
+   auto GetAssociations()    const noexcept -> const Ideas&;
+   auto GetDisassociations() const noexcept -> const Ideas&;
 
    bool HasAssociation     (const Idea*) const;
    bool HasDisassociation  (const Idea*) const;
