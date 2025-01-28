@@ -6,10 +6,10 @@
 /// SPDX-License-Identifier: GPL-3.0-or-later                                 
 ///                                                                           
 #include "AI.hpp"
-#include <Entity/Event.hpp>
-#include <Math/Color.hpp>
-#include <Math/Range.hpp>
-#include <Math/Number.hpp>
+#include <Langulus/Entity/Event.hpp>
+#include <Langulus/Math/Color.hpp>
+#include <Langulus/Math/Range.hpp>
+#include <Langulus/Math/Number.hpp>
 
 LANGULUS_DEFINE_MODULE(
    AI, 0, "AI",

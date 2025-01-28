@@ -7,8 +7,8 @@
 ///                                                                           
 #pragma once
 #include "inner/Ontology.hpp"
-#include <Flow/Verbs/Do.hpp>
-#include <Anyness/TMap.hpp>
+#include <Langulus/Verbs/Do.hpp>
+#include <Langulus/Anyness/TMap.hpp>
 
 using History = TOrderedMap<Time, Many>;
 

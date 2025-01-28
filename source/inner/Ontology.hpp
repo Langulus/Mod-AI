@@ -1,9 +1,9 @@
 #pragma once
 #include "Idea.hpp"
-#include <Flow/Verbs/Associate.hpp>
-#include <Flow/Verbs/Create.hpp>
-#include <Flow/Verbs/Select.hpp>
-#include <Flow/Factory.hpp>
+#include <Langulus/Verbs/Associate.hpp>
+#include <Langulus/Verbs/Create.hpp>
+#include <Langulus/Verbs/Select.hpp>
+#include <Langulus/Flow/Factory.hpp>
 
 
 ///                                                                           

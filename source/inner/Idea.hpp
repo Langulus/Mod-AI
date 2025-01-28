@@ -7,11 +7,11 @@
 ///                                                                           
 #pragma once
 #include "../Common.hpp"
-#include <Anyness/TSet.hpp>
-#include <Flow/Verbs/Do.hpp>
-#include <Flow/Verbs/Associate.hpp>
-#include <Flow/Verbs/Equal.hpp>
-#include <Flow/Verbs/Interpret.hpp>
+#include <Langulus/Anyness/TSet.hpp>
+#include <Langulus/Verbs/Do.hpp>
+#include <Langulus/Verbs/Associate.hpp>
+#include <Langulus/Verbs/Equal.hpp>
+#include <Langulus/Verbs/Interpret.hpp>
 
 struct Idea;
 struct Ontology;

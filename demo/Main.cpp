@@ -6,7 +6,7 @@
 /// SPDX-License-Identifier: GPL-3.0-or-later                                 
 ///                                                                           
 #include "Main.hpp"
-#include <Flow/Time.hpp>
+#include <Langulus/Flow/Time.hpp>
 #include <Langulus/AI.hpp>
 #include <thread>
 #include <iostream>

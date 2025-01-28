@@ -6,9 +6,8 @@
 /// SPDX-License-Identifier: GPL-3.0-or-later                                 
 ///                                                                           
 #pragma once
-#include <Langulus.hpp>
-#include <Flow/Temporal.hpp>
-#include <Flow/Factory.hpp>
+#include <Langulus/Flow/Temporal.hpp>
+#include <Langulus/Flow/Factory.hpp>
 #include <Langulus/AI.hpp>
 
 LANGULUS_EXCEPTION(AI);
