@@ -42,7 +42,7 @@ void Ontology::Select(Verb& verb) {
 ///      this way any previously defined complex ideas will be reused, making 
 ///      the database denser and smaller. But it costs more time...           
 ///   @return the idea representing the data                                  
-auto Ontology::Build(const Many& data, bool findMetapatterns) -> Idea* {
+auto Ontology::Build(const Many& data, bool /*findMetapatterns*/) -> Idea* {
    // Clear the cache every time we build a new pattern                 
    mCache.Clear();
 
