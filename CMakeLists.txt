@@ -15,7 +15,7 @@ file(GLOB_RECURSE
 add_langulus_mod(LangulusModAI ${LANGULUS_MOD_AI_SOURCES})
 
 if(LANGULUS_TESTING)
-    enable_testing()
+	enable_testing()
     add_subdirectory(test)
 endif()
 

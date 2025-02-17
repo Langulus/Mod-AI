@@ -5,20 +5,6 @@
 ///                                                                           
 /// SPDX-License-Identifier: GPL-3.0-or-later                                 
 ///                                                                           
-#include "Main.hpp"
-
-#define CATCH_CONFIG_RUNNER
-#include <catch2/catch.hpp>
+#include <Langulus/MetaOf.hpp>
 
 LANGULUS_RTTI_BOUNDARY(RTTI::MainBoundary)
-
-int main(int argc, char* argv[]) {
-   Logger::ToTXT logFile {"ai-test.txt"};
-   Logger::AttachDuplicator(&logFile);
-
-   Catch::Session session;
-   auto result = session.run(argc, argv);
-
-   Logger::DettachDuplicator(&logFile);
-   return result;
-}
