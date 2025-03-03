@@ -8,6 +8,7 @@
 #pragma once
 #include "../Common.hpp"
 #include <Langulus/Anyness/TSet.hpp>
+#include <Langulus/Flow/Producible.hpp>
 #include <Langulus/Verbs/Do.hpp>
 #include <Langulus/Verbs/Associate.hpp>
 #include <Langulus/Verbs/Equal.hpp>
