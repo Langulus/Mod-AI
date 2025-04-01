@@ -10,6 +10,7 @@
 #include <Langulus/Math/Color.hpp>
 #include <Langulus/Math/Range.hpp>
 #include <Langulus/Math/Number.hpp>
+#include <Langulus/Profiler.hpp>
 
 LANGULUS_DEFINE_MODULE(
    AI, 0, "AI",
@@ -44,6 +45,7 @@ void AI::Teardown() {
 ///   @param deltaTime - time between updates                                 
 ///   @return false                                                           
 bool AI::Update(Time deltaTime) {
+   LANGULUS(PROFILE);
    for (auto& minds : mMinds)
       minds.Update(deltaTime);
    return false;
