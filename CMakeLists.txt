@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.28)
+cmake_minimum_required(VERSION 3.30)
 project(LangulusModAI
     VERSION         1.0.0
     DESCRIPTION     "Langulus plug-in module for simulating minds and societies"
