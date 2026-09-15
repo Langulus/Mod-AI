@@ -13,7 +13,7 @@
 LANGULUS_EXCEPTION(AI);
 
 using namespace Langulus;
-using namespace Anyness;
+using namespace Annies;
 using Temporal = Flow::Temporal;
 
 struct AI;

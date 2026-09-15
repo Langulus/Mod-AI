@@ -6,7 +6,7 @@
 /// SPDX-License-Identifier: GPL-3.0-or-later                                 
 ///                                                                           
 #include "AI.hpp"
-#include <Langulus/Entity/Event.hpp>
+#include <Langulus/Things/Event.hpp>
 #include <Langulus/Math/Color.hpp>
 #include <Langulus/Math/Range.hpp>
 #include <Langulus/Math/Number.hpp>
