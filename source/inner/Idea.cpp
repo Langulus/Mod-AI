@@ -101,7 +101,7 @@ void Idea::Associate(Verb& verb) {
 ///                                                                           
 ///   @param verb - the equals verb                                           
 void Idea::Equal(Verb& verb) const {
-   Count matches = 0;
+   size_t matches = 0;
 
    // Check if the required associations are available                  
    if (verb.IsDeep()) {

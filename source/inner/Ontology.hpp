@@ -23,7 +23,7 @@ private:
    // combinations in a prompt is costly - use that as an optimization  
    mutable TUnorderedMap<Text, Many> mCache;
 
-   Count mLongestKnownText = 0;
+   size_t mLongestKnownText = 0;
 
    Text Self() const;
 

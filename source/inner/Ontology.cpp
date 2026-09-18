@@ -213,7 +213,7 @@ auto Ontology::Interpret(const Text& text) const -> Many {
    // ations may overlap, and are later weighted and filtered by        
    // context.                                                          
    Many result;
-   for (Offset i = 1; i <= text.GetCount(); ++i) {
+   for (size_t i = 1; i <= text.GetCount(); ++i) {
       Many pattern;
       Text token = text.Select(0, i);
       auto lower = token.Lowercase();
@@ -300,7 +300,7 @@ auto Ontology::Interpret(const Text& text) const -> Many {
    bool atLeastOneMetapatternFound = false;
 
    data.ForEachDeep([&](Many& group) {
-      for (Offset i = group.GetCount(); i > 1; --i) {
+      for (size_t i = group.GetCount(); i > 1; --i) {
          auto pattern = group.Select(0, i);
          auto idea = mIdeas.Find(pattern);
          if (not idea)
