@@ -6,7 +6,7 @@ Ontology::Ontology(const A::AIUnit& c) : mOwner {c} {}
 
 /// Ontology descriptor constructor                                           
 ///   @param d - descriptor                                                   
-Ontology::Ontology(const A::AIUnit& c, const Many&) : mOwner {c} {
+Ontology::Ontology(const A::AIUnit& c, Many const&) : mOwner {c} {
    TODO();
 }
 
@@ -42,7 +42,7 @@ void Ontology::Select(Verb& verb) {
 ///      this way any previously defined complex ideas will be reused, making 
 ///      the database denser and smaller. But it costs more time...           
 ///   @return the idea representing the data                                  
-auto Ontology::Build(const Many& data, bool /*findMetapatterns*/) -> Idea* {
+auto Ontology::Build(Many const& data, bool /*findMetapatterns*/) -> Idea* {
    // Clear the cache every time we build a new pattern                 
    mCache.Clear();
 
@@ -52,7 +52,7 @@ auto Ontology::Build(const Many& data, bool /*findMetapatterns*/) -> Idea* {
 
    if (data.IsDeep()) {
       // Represent each group as an idea                                
-      data.ForEach([&](const Many& group) {
+      data.ForEach([&](Many const& group) {
          auto idea = Build(group);
          if (idea)
             coalesced << idea;
@@ -266,7 +266,7 @@ auto Ontology::Interpret(const Text& text) const -> Many {
       
       // Avoid duplication                                              
       bool found = false;
-      result.ForEachDeep<false, false>([&](const Many& group) {
+      result.ForEachDeep<false, false>([&](Many const& group) {
          if (group == pattern) {
             found = true;
             return Loop::Break;

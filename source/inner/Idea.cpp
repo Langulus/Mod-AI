@@ -13,7 +13,7 @@
 /// Constructor                                                               
 ///   @param producer - the idea producer                                     
 ///   @param data - the idea's descriptor                                     
-Idea::Idea(Ontology* producer, const Many& data)
+Idea::Idea(Ontology* producer, Many const& data)
    : ProducedFrom {producer, data} {
    VERBOSE_AI_BUILD("Defining idea for: ", data);
 }
@@ -295,12 +295,12 @@ Many Idea::ExtractInner(DMeta what, IdeaSet& mask) const {
 }
 
 ///TODO move this to Block::Distill?                                          
-Many Idea::ExtractInnerInner(DMeta what, const Many& data) const {
+Many Idea::ExtractInnerInner(DMeta what, Many const& data) const {
    if (data.IsDeep()) {
       // Nest compilation. No escape from this branch                   
       Many scope;
       if (data.IsOr()) {
-         data.ForEach([&](const Many& group) {
+         data.ForEach([&](Many const& group) {
             scope <<= ExtractInnerInner(what, group);
          });
 
@@ -308,7 +308,7 @@ Many Idea::ExtractInnerInner(DMeta what, const Many& data) const {
             scope.MakeOr();
       }
       else {
-         data.ForEach([&](const Many& group) {
+         data.ForEach([&](Many const& group) {
             scope << ExtractInnerInner(what, group);
          });
       }

@@ -32,12 +32,12 @@ private:
 
 public:
    Ontology(const A::AIUnit&);
-   Ontology(const A::AIUnit&, const Many&);
+   Ontology(const A::AIUnit&, Many const&);
 
    void Create(Verb&);
    void Select(Verb&);
 
-   auto Build(const Many&, bool findMetapatterns = true) -> Idea*;
+   auto Build(Many const&, bool findMetapatterns = true) -> Idea*;
    auto BuildText(const Text&) -> Idea*;
    auto Interpret(const Text&) const -> Many;
    //bool FindMetapatterns(Many&) const;

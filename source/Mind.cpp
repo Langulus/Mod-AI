@@ -12,7 +12,7 @@
 /// Mind construction                                                         
 ///   @param producer - the producer                                          
 ///   @param descriptor - instructions for configuring the mind               
-Mind::Mind(AI* producer, const Many& descriptor)
+Mind::Mind(AI* producer, Many const& descriptor)
    : Resolvable   {this}
    , ProducedFrom {producer, descriptor}
    , mOntology    {*this} {
@@ -74,13 +74,13 @@ bool Mind::Update(Time deltaTime) {
 
 /// Log the contents of a pattern in a pretty way                             
 ///   @param data - the pattern to log                                        
-void Mind::DumpPatterns(const Many& data) {
+void Mind::DumpPatterns(Many const& data) {
    if (data.IsDeep()) {
       bool first = true;
 
       if (data.IsOr()) {
          // Display a range of alternatives                             
-         data.ForEach([&](const Many& group) {
+         data.ForEach([&](Many const& group) {
             if (not first)
                Logger::Verbose(Logger::PushDarkYellow, "or ", Logger::Pop);
             else 
@@ -93,7 +93,7 @@ void Mind::DumpPatterns(const Many& data) {
       }
       else {
          // Display a range of sequentials                              
-         data.ForEach([&](const Many& group) {
+         data.ForEach([&](Many const& group) {
             if (not first)
                Logger::Append(", ");
             DumpPatterns(group);
@@ -117,13 +117,13 @@ void Mind::DumpPatterns(const Many& data) {
 /// Compile iterpretations into a temporal flow                               
 ///   @param data - the interpretations to convert to actions                 
 ///   @param output - [in/out] the resulting flow                             
-Many Mind::Compile(const Many& data) const {
+Many Mind::Compile(Many const& data) const {
    Many scope;
 
    if (data.IsDeep()) {
       // Nest compilation. No escape from this branch                   
       if (data.IsOr()) {
-         data.ForEach([&](const Many& group) {
+         data.ForEach([&](Many const& group) {
             scope <<= Compile(group);
          });
 
@@ -131,7 +131,7 @@ Many Mind::Compile(const Many& data) const {
             scope.MakeOr();
       }
       else {
-         data.ForEach([&](const Many& group) {
+         data.ForEach([&](Many const& group) {
             scope << Compile(group);
          });
       }

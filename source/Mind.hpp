@@ -45,11 +45,11 @@ private:
    // Societies this mind is part of                                    
    TMany<Society*> mSocieties;
 
-   static void DumpPatterns(const Many&);
-   Many Compile(const Many&) const;
+   static void DumpPatterns(Many const&);
+   Many Compile(Many const&) const;
 
 public:
-   Mind(AI*, const Many&);
+   Mind(AI*, Many const&);
 
    void Do(Verb&);
 

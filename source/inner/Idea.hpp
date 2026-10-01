@@ -47,7 +47,7 @@ protected:
    Ideas mDisassociations;
 
 public:
-   Idea(Ontology*, const Many&);
+   Idea(Ontology*, Many const&);
    Idea(const Idea&) = delete;
    Idea(Idea&&) = delete;
 
@@ -87,7 +87,7 @@ private:
    void AssociateInner(Verb&);
    auto AdvancedCompare(const Idea*, IdeaSet&) const -> const Idea*;
    Many ExtractInner(DMeta, IdeaSet&) const;
-   Many ExtractInnerInner(DMeta, const Many&) const;
+   Many ExtractInnerInner(DMeta, Many const&) const;
    Text Self() const;
    void Link(Idea*, Ideas&);
 };

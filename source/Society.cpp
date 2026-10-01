@@ -12,7 +12,7 @@
 /// Gatherer construction                                                     
 ///   @param producer - the system producer                                   
 ///   @param descriptor - instructions for configuring the GUI                
-Society::Society(AI* producer, const Many& descriptor)
+Society::Society(AI* producer, Many const& descriptor)
    : Resolvable   {this}
    , ProducedFrom {producer, descriptor}
    , mOntology    {*this} {
