@@ -49,7 +49,7 @@ void Mind::Do(Verb& verb) {
 /// Interpret text                                                            
 ///   @param the message to interpret                                         
 ///   @return the interpreted message                                         
-Many Mind::Interpret(const Text& text) {
+Many Mind::Interpret(Text const& text) {
    Text cloned = Clone(text);
 
    // Find combinations of ideas                                        

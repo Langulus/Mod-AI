@@ -1,27 +1,27 @@
 #pragma once
 #include "Idea.hpp"
+#include <Langulus/Factory.hpp>
 #include <Langulus/Verbs/Associate.hpp>
 #include <Langulus/Verbs/Create.hpp>
 #include <Langulus/Verbs/Select.hpp>
-#include <Langulus/Flow/Factory.hpp>
 
 
 ///                                                                           
 ///   An ontology                                                             
 ///                                                                           
 struct Ontology {
-   LANGULUS_VERBS(Verbs::Create, Verbs::Select);
+   using CTTI_Ability = Types<Verbs::Create, Verbs::Select>;
 
 private:
    // The owning component                                              
-   const A::AIUnit& mOwner;
+   const Things::AIUnit& mOwner;
 
    // The ideas                                                         
    TFactoryUnique<Idea> mIdeas;
 
    // Quick text indexer and auto-completer - iterating all text        
    // combinations in a prompt is costly - use that as an optimization  
-   mutable TUnorderedMap<Text, Many> mCache;
+   mutable TMapUnsorted<Text, Many> mCache;
 
    size_t mLongestKnownText = 0;
 
@@ -31,15 +31,15 @@ private:
    void OptimizeFor(Many&) const;
 
 public:
-   Ontology(const A::AIUnit&);
-   Ontology(const A::AIUnit&, Many const&);
+   Ontology(const Things::AIUnit&);
+   Ontology(const Things::AIUnit&, Many const&);
 
    void Create(Verb&);
    void Select(Verb&);
 
    auto Build(Many const&, bool findMetapatterns = true) -> Idea*;
-   auto BuildText(const Text&) -> Idea*;
-   auto Interpret(const Text&) const -> Many;
+   auto BuildText(Text const&) -> Idea*;
+   auto Interpret(Text const&) const -> Many;
    //bool FindMetapatterns(Many&) const;
    void Teardown();
 };

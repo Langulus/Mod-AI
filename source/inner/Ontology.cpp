@@ -2,11 +2,11 @@
 
 
 /// Default ontology constructor                                              
-Ontology::Ontology(const A::AIUnit& c) : mOwner {c} {}
+Ontology::Ontology(const Things::AIUnit& c) : mOwner {c} {}
 
 /// Ontology descriptor constructor                                           
 ///   @param d - descriptor                                                   
-Ontology::Ontology(const A::AIUnit& c, Many const&) : mOwner {c} {
+Ontology::Ontology(const Things::AIUnit& c, Many const&) : mOwner {c} {
    TODO();
 }
 
@@ -68,7 +68,7 @@ auto Ontology::Build(Many const& data, bool /*findMetapatterns*/) -> Idea* {
       // Code needs to be normalized further by compiling it. Can't     
       // just register it as it is - spaces, cases and optional brackets
       // will produce different hashes and overcomplicate the database. 
-      data.ForEach([&](const Code& code) {
+      data.ForEach([&](Code const& code) {
          auto idea = Build(code.Parse());
          if (idea)
             coalesced << idea;
@@ -76,7 +76,7 @@ auto Ontology::Build(Many const& data, bool /*findMetapatterns*/) -> Idea* {
    }
    else if (data.CastsTo<Text>()) {
       // Text data needs to be sanitized further                        
-      data.ForEach([&](const Text& text) {
+      data.ForEach([&](Text const& text) {
          Idea* idea;
 
          /*if (findMetapatterns) { //TODO use nested Interpet instead - should be more generic
@@ -127,7 +127,7 @@ auto Ontology::Build(Many const& data, bool /*findMetapatterns*/) -> Idea* {
 /// Build a text pattern                                                      
 ///   @param text - pattern to build idea for                                 
 ///   @return the idea representing the text                                  
-auto Ontology::BuildText(const Text& text) -> Idea* {
+auto Ontology::BuildText(Text const& text) -> Idea* {
    // Keep track of the longest known text pattern                      
    if (text.GetCount() > mLongestKnownText)
       mLongestKnownText = text.GetCount();
@@ -197,7 +197,7 @@ void Ontology::OptimizeFor(Many& data) const {
 /// Interpret some text                                                       
 ///   @param text - text to interpret                                         
 ///   @return the hierarchy of ideas in the text                              
-auto Ontology::Interpret(const Text& text) const -> Many {
+auto Ontology::Interpret(Text const& text) const -> Many {
    if (text.IsEmpty())
       return {};
 

@@ -7,7 +7,7 @@
 ///                                                                           
 #include "Main.hpp"
 #include <Langulus/Flow/Time.hpp>
-#include <Langulus/AI.hpp>
+#include <Langulus/CppAPI/AI.hpp>
 #include <thread>
 #include <iostream>
 
@@ -25,7 +25,7 @@ int main(int, char**) {
 
    // Create the mind and build a common ontology for all demos         
    // Let's prove how scalable this strategy really is ;)               
-   auto mind = root.CreateUnit<A::Mind>();
+   auto mind = root.CreateUnit<Things::Mind>();
    BuildOntology(root);
 
    // Pick a demo                                                       

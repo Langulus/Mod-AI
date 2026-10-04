@@ -6,11 +6,9 @@
 /// SPDX-License-Identifier: GPL-3.0-or-later                                 
 ///                                                                           
 #pragma once
-#include <Langulus/Flow/Temporal.hpp>
-#include <Langulus/Flow/Factory.hpp>
-#include <Langulus/AI.hpp>
-
-LANGULUS_EXCEPTION(AI);
+#include <Langulus/Temporal.hpp>
+#include <Langulus/Factory.hpp>
+#include <Langulus/CppAPI/AI.hpp>
 
 using namespace Langulus;
 using namespace Annies;

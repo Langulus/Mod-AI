@@ -6,8 +6,8 @@
 /// SPDX-License-Identifier: GPL-3.0-or-later                                 
 ///                                                                           
 #include "AI.hpp"
-#include <Langulus/Things/Event.hpp>
-#include <Langulus/Math/Color.hpp>
+#include <Langulus/Event.hpp>
+#include <Langulus/Color.hpp>
 #include <Langulus/Math/Range.hpp>
 #include <Langulus/Math/Number.hpp>
 
@@ -24,7 +24,7 @@ LANGULUS_DEFINE_MODULE(
 ///   @param descriptor - instructions for configuring the module             
 AI::AI(Runtime* runtime, Many const&)
    : Resolvable {this}
-   , A::Module  {runtime} {
+   , Things::Module  {runtime} {
    VERBOSE_AI("Initializing...");
    Langulus::RegisterEvents();
    Langulus::Math::RegisterColors();

@@ -7,10 +7,10 @@
 ///                                                                           
 #pragma once
 #include "inner/Ontology.hpp"
+#include <Langulus/TMap.hpp>
 #include <Langulus/Verbs/Do.hpp>
-#include <Langulus/Annies/TMap.hpp>
 
-using History = TOrderedMap<Time, Many>;
+using History = TMapSorted<Time, Many>;
 
 
 ///                                                                           
@@ -19,11 +19,11 @@ using History = TOrderedMap<Time, Many>;
 /// Gives the capability to associate complex notions and to record events    
 /// that are happening to a Thing with this component.                        
 ///                                                                           
-struct Mind final : A::Mind, ProducedFrom<AI> {
-   LANGULUS(ABSTRACT) false;
-   LANGULUS(PRODUCER) AI;
-   LANGULUS_BASES(A::Mind);
-   LANGULUS_VERBS(Verbs::Do);
+struct Mind final : Things::Mind, ProducedFrom<AI> {
+   using CTTI_Abstract = No;
+   using CTTI_Producer = AI;
+   using CTTI_Bases    = Things::Mind;
+   using CTTI_Ability  = Verbs::Do;
 
 private:
    // The mind's lifetime counter                                       
@@ -53,7 +53,7 @@ public:
 
    void Do(Verb&);
 
-   Many Interpret(const Text&);
+   Many Interpret(Text const&);
    bool Update(Time);
    void Refresh() {};
    void Teardown();

@@ -5,7 +5,7 @@
 ///                                                                           
 /// SPDX-License-Identifier: GPL-3.0-or-later                                 
 ///                                                                           
-#include <Langulus/AI.hpp>
+#include <Langulus/CppAPI/AI.hpp>
 #include <Langulus/Testing.hpp>
 
 
@@ -18,14 +18,14 @@ SCENARIO("Mind creation", "[ai]") {
          auto root = Thing::Root<false>("AI");
 
          WHEN("The mind is created via abstraction") {
-            auto mind = root.CreateUnit<A::Mind>();
+            auto mind = root.CreateUnit<Things::Mind>();
 
             // Update once                                              
             root.Update({});
             root.DumpHierarchy();
 
             REQUIRE(mind.GetCount() == 1);
-            REQUIRE(mind.CastsTo<A::Mind>(1));
+            REQUIRE(mind.CastsTo<Things::Mind>(1));
             REQUIRE(mind.IsSparse());
 
             REQUIRE(root.GetUnits().GetCount() == 1);
@@ -40,7 +40,7 @@ SCENARIO("Mind creation", "[ai]") {
             root.DumpHierarchy();
 
             REQUIRE(mind.GetCount() == 1);
-            REQUIRE(mind.CastsTo<A::Mind>(1));
+            REQUIRE(mind.CastsTo<Things::Mind>(1));
             REQUIRE(mind.IsSparse());
 
             REQUIRE(root.GetUnits().GetCount() == 1);

@@ -6,9 +6,9 @@
 /// SPDX-License-Identifier: GPL-3.0-or-later                                 
 ///                                                                           
 #pragma once
-#include "../Common.hpp"
-#include <Langulus/Annies/TSet.hpp>
-#include <Langulus/Flow/Producible.hpp>
+#include "../Export.hpp"
+#include <Langulus/TSet.hpp>
+#include <Langulus/Producible.hpp>
 #include <Langulus/Verbs/Do.hpp>
 #include <Langulus/Verbs/Associate.hpp>
 #include <Langulus/Verbs/Equal.hpp>
@@ -26,7 +26,7 @@ using Rating  = Real;
 ///   An idea                                                                 
 ///                                                                           
 struct Idea : Referenced, ProducedFrom<Ontology> {
-   LANGULUS(PRODUCER) Ontology;
+   using CTTI_Producer = Ontology;
    LANGULUS_CONVERTS_TO(Text);
    LANGULUS_VERBS(
       Verbs::Equal,
