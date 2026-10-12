@@ -14,7 +14,7 @@ struct Ontology {
 
 private:
    // The owning component                                              
-   const Things::AIUnit& mOwner;
+   const Things::AIPart& mOwner;
 
    // The ideas                                                         
    TFactoryUnique<Idea> mIdeas;
@@ -31,8 +31,8 @@ private:
    void OptimizeFor(Many&) const;
 
 public:
-   Ontology(const Things::AIUnit&);
-   Ontology(const Things::AIUnit&, Many const&);
+   Ontology(const Things::AIPart&);
+   Ontology(const Things::AIPart&, Many const&);
 
    void Create(Verb&);
    void Select(Verb&);

@@ -2,11 +2,11 @@
 
 
 /// Default ontology constructor                                              
-Ontology::Ontology(const Things::AIUnit& c) : mOwner {c} {}
+Ontology::Ontology(const Things::AIPart& c) : mOwner {c} {}
 
 /// Ontology descriptor constructor                                           
 ///   @param d - descriptor                                                   
-Ontology::Ontology(const Things::AIUnit& c, Many const&) : mOwner {c} {
+Ontology::Ontology(const Things::AIPart& c, Many const&) : mOwner {c} {
    TODO();
 }
 
