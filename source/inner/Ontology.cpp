@@ -48,7 +48,7 @@ auto Ontology::Build(Many const& data, bool /*findMetapatterns*/) -> Idea* {
 
    Ideas coalesced;
    if (data.IsOr())
-      coalesced.MakeOr();
+      coalesced.EnableOr();
 
    if (data.IsDeep()) {
       // Represent each group as an idea                                
@@ -229,14 +229,14 @@ auto Ontology::Interpret(Text const& text) const -> Many {
          auto idea2 = mIdeas.Find(lower);
          if (idea1 and idea2) {
             pattern << idea1 << idea2;
-            pattern.MakeOr();
+            pattern.EnableOr();
          }
          else if (idea1) {
             pattern << idea1;
          }
          else if (idea2) {
             pattern << token << idea2;
-            pattern.MakeOr();
+            pattern.EnableOr();
          }
       }
 
@@ -283,7 +283,7 @@ auto Ontology::Interpret(Text const& text) const -> Many {
    }
 
    if (result.GetCount() > 1)
-      result.MakeOr();
+      result.EnableOr();
    return result;
 }
 

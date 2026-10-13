@@ -128,7 +128,7 @@ Many Mind::Compile(Many const& data) const {
          });
 
          if (scope.GetCount() > 1)
-            scope.MakeOr();
+            scope.EnableOr();
       }
       else {
          data.ForEach([&](Many const& group) {
@@ -156,7 +156,7 @@ Many Mind::Compile(Many const& data) const {
          }
 
          if (scope.GetCount() > 1)
-            scope.MakeOr();
+            scope.EnableOr();
       }
       else for (auto idea : ideas) {
          // Push verbs if any were available, otherwise push ideas      

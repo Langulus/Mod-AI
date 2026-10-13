@@ -305,7 +305,7 @@ Many Idea::ExtractInnerInner(DMeta what, Many const& data) const {
          });
 
          if (scope.GetCount() > 1)
-            scope.MakeOr();
+            scope.EnableOr();
       }
       else {
          data.ForEach([&](Many const& group) {
