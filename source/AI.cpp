@@ -44,7 +44,7 @@ void AI::Teardown() {
 ///   @param deltaTime - time between updates                                 
 ///   @return false                                                           
 bool AI::Update(Time deltaTime) {
-   LANGULUS(PROFILE);
+   LglsProfile();
    for (auto& minds : mMinds)
       minds.Update(deltaTime);
    return false;
