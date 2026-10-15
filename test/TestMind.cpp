@@ -33,7 +33,7 @@ SCENARIO("Mind creation", "[ai]") {
 
       #if LANGULUS_FEATURE(MANAGED_REFLECTION)
          WHEN("The mind is created via token") {
-            auto mind = root.CreateUnitToken("Mind");
+            auto mind = root.CreatePartToken("Mind");
 
             // Update once                                              
             root.Update({});
