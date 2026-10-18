@@ -140,7 +140,7 @@ Many Mind::Compile(Many const& data) const {
    }
 
    // Flat if reached                                                   
-   if (data.IsSimilar<Idea*>()) {
+   if (data.IsSame<Idea*>()) {
       // Push ideas by extracting verbs from them                       
       // If no verbs were available, just push the idea itself - it can 
       // later by interpreted to sought data on demand                  

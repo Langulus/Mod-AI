@@ -169,7 +169,7 @@ void Ontology::OptimizeFor(Many& data) const {
       else if (group.IsDeep())
          return Loop::Continue;  // Just continue on otherwise deep     
 
-      if (group.template IsSimilar<FOR>()) {
+      if (group.template IsSame<FOR>()) {
          // Consume any sequential data (even if deep)                  
          auto& g = reinterpret_cast<TMany<FOR>&>(group);
          for (auto const& relevant : g)
