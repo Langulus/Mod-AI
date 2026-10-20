@@ -14,9 +14,9 @@
 ///                                                                           
 ///   AI module, producer of minds and societies                              
 ///                                                                           
-struct AI final : A::AIModule {
+struct AI final : Things::AIModule {
    using CTTI_Abstract = No;
-   LANGULUS_BASES(A::AIModule);
+   LANGULUS_BASES(Things::AIModule);
    LANGULUS_VERBS(Verbs::Create);
 
 private:
