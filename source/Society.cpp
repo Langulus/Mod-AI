@@ -13,7 +13,7 @@
 ///   @param producer - the system producer                                   
 ///   @param descriptor - instructions for configuring the GUI                
 Society::Society(AI* producer, Many const& descriptor)
-   : Resolvable   {this}
+   : Downcastable   {this}
    , ProducedFrom {producer, descriptor}
    , mOntology    {*this} {
    VERBOSE_AI("Initializing...");

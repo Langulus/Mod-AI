@@ -13,7 +13,7 @@
 ///   @param producer - the producer                                          
 ///   @param descriptor - instructions for configuring the mind               
 Mind::Mind(AI* producer, Many const& descriptor)
-   : Resolvable   {this}
+   : Downcastable   {this}
    , ProducedFrom {producer, descriptor}
    , mOntology    {*this} {
    VERBOSE_AI("Initializing...");
