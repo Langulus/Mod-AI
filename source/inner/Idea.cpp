@@ -77,7 +77,7 @@ void Idea::AssociateInner(Verb& verb) {
 
    // Build an idea representing the argument, and (dis)associate       
    // with it instead                                                   
-   auto idea = GetOntology()->Build(verb.GetArgument());
+   auto idea = GetOntology()->Build(verb.GetRHS());
    if (LinkIdea<ASSOCIATE>(idea))
       verb << this;
 }
