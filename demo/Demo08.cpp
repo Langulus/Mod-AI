@@ -13,7 +13,6 @@
 ///                                                                           
 /// Advanced geometry, shading, heightmapping, multilevel physics,            
 /// multilevel rendering.                                                     
-///                                                                           
 void Demo08(Thing& root) {
    auto ms = root.CreateChild("Demo08");
    //todo ontology definitions

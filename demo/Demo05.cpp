@@ -13,7 +13,6 @@
 ///                                                                           
 /// Userless complex system creation from memory, acting on missing symbols,  
 /// interaction caching, resuming.                                            
-///                                                                           
 void Demo05(Thing& root) {
    auto ms = root.CreateChild("Demo05");
    // "solar" and "system" shouldn't be in the ontology!                

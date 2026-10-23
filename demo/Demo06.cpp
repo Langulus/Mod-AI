@@ -13,7 +13,6 @@
 ///                                                                           
 /// Complex system association, number parsing, arithmetic operators, casual  
 /// speech, advanced context juggle.                                          
-///                                                                           
 void Demo06(Thing& root) {
    auto ms = root.CreateChild("Demo06");
    //todo ontology definitions

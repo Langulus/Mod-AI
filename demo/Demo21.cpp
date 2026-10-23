@@ -12,7 +12,6 @@
 ///   Demo 21                                                                 
 ///                                                                           
 /// File input/output                                                         
-///                                                                           
 void Demo21(Thing& root) {
    auto ms = root.CreateChild("Demo21");
    //todo do with text

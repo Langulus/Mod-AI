@@ -12,7 +12,6 @@
 ///   Demo 09                                                                 
 ///                                                                           
 /// Sentence segmentation, context group separation, case sensitivity tests.  
-///                                                                           
 void Demo09(Thing& root) {
    auto ms = root.CreateChild("Demo09");
    //todo ontology definitions

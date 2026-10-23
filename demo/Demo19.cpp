@@ -12,7 +12,6 @@
 ///   Demo 19                                                                 
 ///                                                                           
 /// Testing user interface creation and UI interpretation                     
-///                                                                           
 void Demo19(Thing& root) {
    auto ms = root.CreateChild("Demo19");
    //todo make with language

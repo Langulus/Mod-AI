@@ -12,8 +12,7 @@
 ///   Demo 01                                                                 
 ///                                                                           
 /// For testing user/session introduction, property setting, entity creation, 
-/// basic geometry, contextual chain, controller setup                        
-///                                                                           
+/// basic geometry, contextual chain, controller setup.                       
 void Demo01(Thing& root) {
    auto ms = root.CreateChild("Demo01");
    ms->LoadMod("UMS");

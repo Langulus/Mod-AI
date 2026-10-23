@@ -12,7 +12,6 @@
 ///   Demo 07                                                                 
 ///                                                                           
 /// Designing a Game Of Life with words                                       
-///                                                                           
 void Demo07(Thing& root) {
    auto ms = root.CreateChild("Demo07");
    //todo ontology definitions

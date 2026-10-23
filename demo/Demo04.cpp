@@ -12,7 +12,6 @@
 ///   Demo 04                                                                 
 ///                                                                           
 /// Userless requests, chained massive introductions, verb coupling           
-///                                                                           
 void Demo04(Thing& root) {
    auto ms = root.CreateChild("Demo04");
    ms->Say("create a game with 50 red cubes and a single blue one");

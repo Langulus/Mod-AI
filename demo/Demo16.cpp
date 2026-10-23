@@ -12,7 +12,6 @@
 ///   Demo 16                                                                 
 ///                                                                           
 /// Testing simple pattern recognition and solving simple equations           
-///                                                                           
 void Demo16(Thing& root) {
    auto ms = root.CreateChild("Demo16");
    //todo ontology definitions

@@ -12,7 +12,6 @@
 ///   Demo 03                                                                 
 ///                                                                           
 /// Via Alexander Ivanov (2017)                                               
-///                                                                           
 void Demo03(Thing& root) {
    auto ms = root.CreateChild("Demo03");
    ms->Say("create game called color cars");

@@ -13,7 +13,6 @@
 ///                                                                           
 /// Execute shadertoy code in renderer with minimal code (no interaction)     
 /// Based on https://www.shadertoy.com/view/WdXGRj                            
-///                                                                           
 void Demo18(Thing& root) {
    auto ms = root.CreateChild("Demo18");
    //todo make with language

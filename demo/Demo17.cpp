@@ -12,8 +12,7 @@
 ///   Demo 17                                                                 
 ///                                                                           
 /// Complex script with interactive scene, rendering, geometry content        
-/// Tests keyboard/mouse input, AABB culling, multiple octaves, tag changes 
-///                                                                           
+/// Tests keyboard/mouse input, AABB culling, multiple octaves, tag changes.  
 void Demo17(Thing& root) {
    auto ms = root.CreateChild("Demo17");
    //todo make with language

@@ -12,7 +12,6 @@
 ///   Demo 14                                                                 
 ///                                                                           
 /// Even bigger stress and performance test                                   
-///                                                                           
 void Demo14(Thing& root) {
    auto ms = root.CreateChild("Demo14");
    //todo ontology definitions

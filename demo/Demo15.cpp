@@ -12,7 +12,6 @@
 ///   Demo 15                                                                 
 ///                                                                           
 /// Building, GUI                                                             
-///                                                                           
 void Demo15(Thing& root) {
    auto ms = root.CreateChild("Demo15");
    //todo ontology definitions

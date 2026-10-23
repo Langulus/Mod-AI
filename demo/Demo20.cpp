@@ -13,7 +13,6 @@
 ///                                                                           
 /// Execute shadertoy code in renderer. This one with texture and movement    
 /// support. Shader based on https://www.shadertoy.com/view/MtGSzD            
-///                                                                           
 void Demo20(Thing& root) {
    auto ms = root.CreateChild("Demo20");
    /*ms->DoGASM("Create(AWindow, ACamera, AInstance, CController)");

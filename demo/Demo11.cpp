@@ -13,7 +13,6 @@
 ///                                                                           
 /// Advanced memory recall, inline associations, advanced context juggling    
 /// Casual speech (mistakes are intentional)                                  
-///                                                                           
 void Demo11(Thing& root) {
    auto ms = root.CreateChild("Demo11");
    //todo ontology definitions

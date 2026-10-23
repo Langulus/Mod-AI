@@ -12,7 +12,6 @@
 ///   Demo 10                                                                 
 ///                                                                           
 /// Memory recall, reverse associations                                       
-///                                                                           
 void Demo10(Thing& root) {
    auto ms = root.CreateChild("Demo10");
    //todo ontology definitions

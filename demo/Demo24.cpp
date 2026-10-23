@@ -12,7 +12,6 @@
 ///   Demo 24                                                                 
 ///                                                                           
 /// Another, more complex shader generation (text -> GLSL interpretation)     
-///                                                                           
 void Demo24(Thing& root) {
    auto ms = root.CreateChild("Demo24");
    //todo do with text

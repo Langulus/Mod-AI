@@ -12,7 +12,6 @@
 ///   Demo 12                                                                 
 ///                                                                           
 /// GUI testing - interpreting data as GUI components                         
-///                                                                           
 void Demo12(Thing& root) {
    auto ms = root.CreateChild("Demo12");
    //todo ontology definitions

@@ -13,7 +13,6 @@
 ///                                                                           
 /// For testing entity creation with properties, massive introductions        
 /// and physical coordination, camera constraints, geometry, conditionals.    
-///                                                                           
 void Demo02(Thing& root) {
    auto ms = root.CreateChild("Demo02");
    ms->Say("hi, my name is Dimo");
