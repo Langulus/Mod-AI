@@ -205,8 +205,8 @@ auto Ontology::Interpret(Text const& text) const -> Many {
    VERBOSE_AI_INTERPRET_TAB("Interpreting: ", text);
    const auto cached = mCache.FindIt(text);
    if (cached) {
-      VERBOSE_AI_INTERPRET("Cached: ", cached.GetValue());
-      return cached.GetValue();
+      VERBOSE_AI_INTERPRET("Cached: ", cached.GetVal());
+      return cached.GetVal();
    }
 
    // Since this is a natural language module, plausible interpret-     

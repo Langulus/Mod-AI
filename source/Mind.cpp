@@ -54,7 +54,7 @@ Many Mind::Interpret(Text const& text) {
 
    // Find combinations of ideas                                        
    auto interpretations = mOntology.Interpret(cloned);
-   const auto tab = Logger::VerboseTab(Self(), Logger::Green,
+   const auto tab = Logger::VerboseTab(this, Logger::Green,
       "Interpreted `", cloned, "` into: ");
    Logger::Verbose("");
    DumpPatterns(interpretations);
