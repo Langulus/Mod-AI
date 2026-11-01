@@ -13,11 +13,10 @@
 
 ///                                                                           
 ///   AI module, producer of minds and societies                              
-///                                                                           
 struct AI final : Things::AIModule {
-   using CTTI_Abstract = No;
-   LANGULUS_BASES(Things::AIModule);
-   LANGULUS_VERBS(Verbs::Create);
+   using CTTI_Abstract  = No;
+   using CTTI_Bases     = Things::AIModule;
+   using CTTI_Ability   = Verbs::Create;
 
 private:
    // List of created minds                                             

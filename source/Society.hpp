@@ -15,11 +15,10 @@
 /// Acts as an optimization by storing shared data and manages roles.         
 /// Societies emerge when minds have a lot of shared knowledge.               
 /// Roles emerge when minds start specializing and dividing labor.            
-///                                                                           
 struct Society final : Things::AIPart, ProducedFrom<AI> {
-   using CTTI_Abstract = No;
-   using CTTI_Producer = AI;
-   LANGULUS_BASES(Things::AIPart);
+   using CTTI_Abstract  = No;
+   using CTTI_Producer  = AI;
+   using CTTI_Bases     = Things::AIPart;
 
 private:
    // Shared history                                                    
