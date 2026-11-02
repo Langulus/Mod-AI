@@ -18,7 +18,6 @@ using History = TMapSorted<Time, Many>;
 ///                                                                           
 /// Gives the capability to associate complex notions and to record events    
 /// that are happening to a Thing with this component.                        
-///                                                                           
 struct Mind final : Things::Mind, ProducedFrom<AI> {
    using CTTI_Abstract = No;
    using CTTI_Producer = AI;
@@ -49,7 +48,7 @@ private:
    Many Compile(Many const&) const;
 
 public:
-   Mind(AI*, Many const&);
+   Mind(AI*, Neat const&);
 
    void Do(Verb&);
 

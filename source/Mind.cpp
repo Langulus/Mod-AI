@@ -10,10 +10,10 @@
 
 
 /// Mind construction                                                         
-///   @param producer - the producer                                          
-///   @param descriptor - instructions for configuring the mind               
-Mind::Mind(AI* producer, Many const& descriptor)
-   : Downcastable   {this}
+///   @param producer the producer                                            
+///   @param descriptor instructions for configuring the mind                 
+Mind::Mind(AI* producer, Neat const& descriptor)
+   : Downcastable {this}
    , ProducedFrom {producer, descriptor}
    , mOntology    {*this} {
    VERBOSE_AI("Initializing...");
@@ -28,15 +28,17 @@ void Mind::Teardown() {
    mOntology.Teardown();
 }
 
-/// A mind records everything that happens around it                          
-/// This happens through a dispatching Do verb                                
-///   @param verb - the verb to log and dispatch                              
+/// A mind records everything that happens around it.                         
+/// This happens through a custom dispatcher, a.k.a. a Do verb.               
+///   @param verb the verb to log and dispatch                                
 void Mind::Do(Verb& verb) {
    //TODO some verbs require sensing organs to register, filter those here
    // Record history                                                    
-   if (not mHistory.ContainsKey(mLifetime))
-      mHistory.Insert(mLifetime);
-   mHistory[mLifetime] << verb;
+   auto found = mHistory.Find(mLifetime);
+   if (not found)
+      mHistory.Merge(mLifetime, verb);
+   else
+      found.GetVal()->Insert(verb);
 
    // Dispatch                                                          
    if (verb.template IsVerb<Verbs::Create>()
@@ -54,9 +56,8 @@ Many Mind::Interpret(Text const& text) {
 
    // Find combinations of ideas                                        
    auto interpretations = mOntology.Interpret(cloned);
-   const auto tab = Logger::VerboseTab(this, Logger::Green,
+   auto _ = Logger::VerboseScoped(this, Logger::Green,
       "Interpreted `", cloned, "` into: ");
-   Logger::Verbose("");
    DumpPatterns(interpretations);
 
    // Convert those ideas into actions                                  
@@ -64,7 +65,7 @@ Many Mind::Interpret(Text const& text) {
 }
 
 /// Mind update routine                                                       
-///   @param deltaTime - time between updates                                 
+///   @param deltaTime time between updates                                   
 ///   @return false                                                           
 bool Mind::Update(Time deltaTime) {
    //TODO don't increment time if passed out
@@ -73,7 +74,7 @@ bool Mind::Update(Time deltaTime) {
 }
 
 /// Log the contents of a pattern in a pretty way                             
-///   @param data - the pattern to log                                        
+///   @param data the pattern to log                                          
 void Mind::DumpPatterns(Many const& data) {
    if (data.IsDeep()) {
       bool first = true;
@@ -115,8 +116,8 @@ void Mind::DumpPatterns(Many const& data) {
 }
 
 /// Compile iterpretations into a temporal flow                               
-///   @param data - the interpretations to convert to actions                 
-///   @param output - [in/out] the resulting flow                             
+///   @param data the interpretations to convert to actions                   
+///   @param output [in/out] the resulting flow                               
 Many Mind::Compile(Many const& data) const {
    Many scope;
 
@@ -144,7 +145,7 @@ Many Mind::Compile(Many const& data) const {
       // Push ideas by extracting verbs from them                       
       // If no verbs were available, just push the idea itself - it can 
       // later by interpreted to sought data on demand                  
-      auto& ideas = reinterpret_cast<const TMany<const Idea*>&>(data);
+      auto& ideas = reinterpret_cast<const TMany<Idea const*>&>(data);
 
       if (data.IsOr()) {
          // If ideas are mutually exclusive, collect all branches and   

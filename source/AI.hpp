@@ -25,7 +25,7 @@ private:
    TFactory<Society> mSocieties;
 
 public:
-   AI(Runtime*, Many const&);
+   AI(Runtime*, Neat const&);
 
    bool Update(Time);
    void Create(Verb&);

@@ -10,6 +10,7 @@
 #include <Langulus/Math/Color.hpp>
 #include <Langulus/Math/Range.hpp>
 #include <Langulus/Math/Number.hpp>
+#include <Langulus/Profiler.hpp>
 
 LANGULUS_DEFINE_MODULE(
    AI, 0, "AI",
@@ -20,17 +21,17 @@ LANGULUS_DEFINE_MODULE(
 
 
 /// Module construction                                                       
-///   @param runtime - the runtime that owns the module                       
-///   @param descriptor - instructions for configuring the module             
-AI::AI(Runtime* runtime, Many const&)
+///   @param runtime the runtime that owns the module                         
+///   @param descriptor instructions for configuring the module               
+AI::AI(Runtime* runtime, Neat const&)
    : Downcastable {this}
-   , Things::Module  {runtime} {
+   , Module       {runtime} {
    VERBOSE_AI("Initializing...");
-   Langulus::RegisterEvents();
-   Langulus::Math::RegisterColors();
-   Langulus::Math::RegisterVectors();
-   Langulus::Math::RegisterRanges();
-   Langulus::Math::RegisterNumbers();
+   RegisterEvents();
+   Math::RegisterColors();
+   Math::RegisterVectors();
+   Math::RegisterRanges();
+   Math::RegisterNumbers();
    VERBOSE_AI("Initialized");
 }
 
@@ -41,7 +42,7 @@ void AI::Teardown() {
 }
 
 /// Module update routine                                                     
-///   @param deltaTime - time between updates                                 
+///   @param deltaTime time between updates                                   
 ///   @return false                                                           
 bool AI::Update(Time deltaTime) {
    LglsProfile();
@@ -51,7 +52,7 @@ bool AI::Update(Time deltaTime) {
 }
 
 /// Create/Destroy minds and societies                                        
-///   @param verb - the creation/destruction verb                             
+///   @param verb the creation/destruction verb                               
 void AI::Create(Verb& verb) {
    mMinds.Create(this, verb);
    mSocieties.Create(this, verb);

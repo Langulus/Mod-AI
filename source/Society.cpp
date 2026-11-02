@@ -9,11 +9,11 @@
 #include "AI.hpp"
 
 
-/// Gatherer construction                                                     
-///   @param producer - the system producer                                   
-///   @param descriptor - instructions for configuring the GUI                
-Society::Society(AI* producer, Many const& descriptor)
-   : Downcastable   {this}
+/// Society construction                                                      
+///   @param producer the AI module that produced the society                 
+///   @param descriptor instructions for configuring the society              
+Society::Society(AI* producer, Neat const& descriptor)
+   : Downcastable {this}
    , ProducedFrom {producer, descriptor}
    , mOntology    {*this} {
    VERBOSE_AI("Initializing...");

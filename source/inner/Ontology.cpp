@@ -60,7 +60,7 @@ auto Ontology::Build(Many const& data, bool /*findMetapatterns*/) -> Idea* {
    }
    else if (data.Is<Idea>()) {
       // Ideas are forwarded directly                                   
-      data.ForEach([&](const Idea& idea) {
+      data.ForEach([&](Idea const& idea) {
          coalesced << &const_cast<Idea&>(idea);
       });
    }

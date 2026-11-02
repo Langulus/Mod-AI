@@ -11,9 +11,9 @@
 
 
 /// Constructor                                                               
-///   @param producer - the idea producer                                     
-///   @param data - the idea's descriptor                                     
-Idea::Idea(Ontology* producer, Many const& data)
+///   @param producer the idea producer                                       
+///   @param data the idea's descriptor                                       
+Idea::Idea(Ontology* producer, Neat const& data)
    : ProducedFrom {producer, data} {
    VERBOSE_AI_BUILD("Defining idea for: ", data);
 }
@@ -31,8 +31,8 @@ auto Idea::GetOntology() const -> Ontology* {
 }
 
 /// Associate/Disassociate with a single idea                                 
-///   @tparam ASSOCIATE - true to associate, false to disassociate            
-///   @param idea - the idea to (dis)associate with                           
+///   @tparam ASSOCIATE true to associate, false to disassociate              
+///   @param idea the idea to (dis)associate with                             
 ///   @return true if the idea was added as (dis)association                  
 template<bool ASSOCIATE>
 bool Idea::LinkIdea(Idea* idea) {
@@ -61,8 +61,8 @@ bool Idea::LinkIdea(Idea* idea) {
 }
 
 /// Inner (dis)association                                                    
-///   @tparam ASSOCIATE - true to associate, false to disassociate            
-///   @param verb - the verb to satisfy                                       
+///   @tparam ASSOCIATE true to associate, false to disassociate              
+///   @param verb the verb to satisfy                                         
 template<bool ASSOCIATE>
 void Idea::AssociateInner(Verb& verb) {
    // Notice, that an idea can have the same associations and dis-      
@@ -83,7 +83,7 @@ void Idea::AssociateInner(Verb& verb) {
 }
 
 /// Associate/disassociate ideas                                              
-///   @param verb - the association verb                                      
+///   @param verb the association verb                                        
 void Idea::Associate(Verb& verb) {
    if (verb.GetMass() > 0)
       AssociateInner<true>(verb);
@@ -91,15 +91,15 @@ void Idea::Associate(Verb& verb) {
       AssociateInner<false>(verb);
 }
 
-/// Compare ideas                                                             
-/// Ideas are the same, if RHS is the same, or an association to LHS          
+/// Compare ideas.                                                            
+/// Ideas are the same, if RHS is the same, or an association to LHS.         
 /// They don't need to match exactly. The natural language equivalent to this 
 /// is simply asking "is swan a bird?". It will be, if "swan" contains "bird".
 /// Here's how this looks in code:                                            
 ///                                                                           
 ///   { ##swan == ##bird } will return ##swan if true, or nothing if not      
 ///                                                                           
-///   @param verb - the equals verb                                           
+///   @param verb the equals verb                                             
 void Idea::Equal(Verb& verb) const {
    size_t matches = 0;
 
@@ -134,11 +134,12 @@ void Idea::Equal(Verb& verb) const {
 
 /// Iterates through all nested associations and disassociations in search    
 /// for an idea. The name of the game is: find if we can walk from this idea  
-/// to 'what' and vice versa, without hitting any disassociation on the way   
-///   @param what - the idea to search for                                    
-///   @param mask - a set of covered ideas to avoid infinite regresses        
+/// to 'what' and vice versa, without hitting any disassociation on the way.  
+///   @param what the idea to search for                                      
+///   @param mask a set of covered ideas to avoid infinite regresses          
 ///   @return the idea which contained the association (if found)             
-auto Idea::AdvancedCompare(const Idea* what, IdeaSet& mask) const -> const Idea* {
+auto Idea::AdvancedCompare(Idea const* what, IdeaSet& mask) const
+-> Idea const* {
    if (mask.Contains(this))
       return nullptr;
 
@@ -167,41 +168,41 @@ auto Idea::AdvancedCompare(const Idea* what, IdeaSet& mask) const -> const Idea*
 }
 
 /// Compare crumb ratings                                                     
-///   @param other - the crumb to compare against                             
+///   @param other the crumb to compare against                               
 ///   @return true if left crumb has the higher rating                        
-bool Idea::operator > (const Idea& other) const noexcept {
+bool Idea::operator > (Idea const& other) const noexcept {
    return mRating > other.mRating;
 }
 
 /// Compare crumb ratings                                                     
-///   @param other - the crumb to compare against                             
+///   @param other the crumb to compare against                               
 ///   @return true if right crumb has the higher rating                       
-bool Idea::operator < (const Idea& other) const noexcept {
+bool Idea::operator < (Idea const& other) const noexcept {
    return mRating < other.mRating;
 }
 
 /// Get the list of associations                                              
 ///   @return the contained associations                                      
-auto Idea::GetAssociations() const noexcept -> const Ideas& {
+auto Idea::GetAssociations() const noexcept -> Ideas const& {
    return mAssociations;
 }
 
 /// Check if crumb has a given association                                    
-///   @param n - the idea to check if inside associations                     
+///   @param n the idea to check if inside associations                       
 ///   @return true if the idea is inside list of associations                 
-bool Idea::HasAssociation(const Idea* n) const {
+bool Idea::HasAssociation(Idea const* n) const {
    return mAssociations.Contains(n);
 }
 
 /// Check if crumb has a given disassociation                                 
-///   @param n - the idea to check if inside disassociations                  
+///   @param n the idea to check if inside disassociations                    
 ///   @return true if the idea is inside list of disassociations              
-bool Idea::HasDisassociation(const Idea* n) const {
+bool Idea::HasDisassociation(Idea const* n) const {
    return mDisassociations.Contains(n);
 }
 
 /// Associate this crumb with some data. Symmetic association                 
-///   @param n - the idea to insert in associations                           
+///   @param n the idea to insert in associations                             
 void Idea::Associate(Idea* n) {
    if (HasAssociation(n))
       return;
@@ -212,7 +213,7 @@ void Idea::Associate(Idea* n) {
 }
 
 /// Associate this crumb with some data. Symmetic association                 
-///   @param n - the idea to insert in disassociations                        
+///   @param n the idea to insert in disassociations                          
 void Idea::Disassociate(Idea* n) {
    if (HasDisassociation(n))
       return;
@@ -253,7 +254,7 @@ Idea::operator Text() const {
 
 /// Interpret the idea as something - useful to extract specific data from    
 /// an Idea - extensively used when linking flows                             
-///   @param verb - the interpretation verb                                   
+///   @param verb the interpretation verb                                     
 void Idea::Interpret(Verb& verb) const {
    verb.ForEachDeep([&](DMeta type) {
       IdeaSet mask;
@@ -269,8 +270,8 @@ void Idea::Interpret(Verb& verb) const {
 /// for data of specific type. The name of the game is: find if we can walk   
 /// from this idea to an instance of T, without hitting any disassociation on 
 /// the way. The hierarchy of all contained instances of T will be preserved. 
-///   @param what - the data type to search for                               
-///   @param mask - a set of covered ideas to avoid infinite regresses        
+///   @param what the data type to search for                                 
+///   @param mask a set of covered ideas to avoid infinite regresses          
 ///   @return the extracted hierarchy of instances of T                       
 Many Idea::ExtractInner(DMeta what, IdeaSet& mask) const {
    if (mask.Contains(this))
@@ -294,7 +295,7 @@ Many Idea::ExtractInner(DMeta what, IdeaSet& mask) const {
    return result;
 }
 
-///TODO move this to Block::Distill?                                          
+//TODO move this to Block::Distill?                                          
 Many Idea::ExtractInnerInner(DMeta what, Many const& data) const {
    if (data.IsDeep()) {
       // Nest compilation. No escape from this branch                   

@@ -18,21 +18,19 @@ struct Idea;
 struct Ontology;
 
 using Ideas   = TMany<Idea*>;
-using IdeaSet = TSet<const Idea*>;
+using IdeaSet = TSet<Idea const*>;
 using Rating  = Real;
 
 
 ///                                                                           
 ///   An idea                                                                 
-///                                                                           
 struct Idea : Referenced, ProducedFrom<Ontology> {
    using CTTI_Producer = Ontology;
-   LANGULUS_CONVERTS_TO(Text);
-   LANGULUS_VERBS(
+   using CTTI_Ability  = Types<
       Verbs::Equal,
       Verbs::Associate,
       Verbs::Interpret
-   );
+   >;
 
 protected:
    friend struct Ontology;
@@ -47,20 +45,20 @@ protected:
    Ideas mDisassociations;
 
 public:
-   Idea(Ontology*, Many const&);
-   Idea(const Idea&) = delete;
+   Idea(Ontology*, Neat const&);
+   Idea(Idea const&) = delete;
    Idea(Idea&&) = delete;
 
-   void Associate(Verb&);
    void Equal(Verb&) const;
+   void Associate(Verb&);
    void Interpret(Verb&) const;
 
    void Teardown();
-   auto GetOntology() const->Ontology*;
+   auto GetOntology() const -> Ontology*;
    explicit operator Text() const;
 
    /// Extract a specific type from all idea associations                     
-   ///   @tparam T - the type to seek for                                     
+   ///   @tparam T the type to seek for                                       
    ///   @return the hierarchy of the selected type                           
    template<CT::Flat T>
    Many Extract() const {
@@ -68,14 +66,14 @@ public:
       return ExtractInner(MetaDataOf<T>(), mask);
    }
 
-   bool operator > (const Idea&) const noexcept;
-   bool operator < (const Idea&) const noexcept;
+   bool operator > (Idea const&) const noexcept;
+   bool operator < (Idea const&) const noexcept;
 
-   auto GetAssociations()    const noexcept -> const Ideas&;
-   auto GetDisassociations() const noexcept -> const Ideas&;
+   auto GetAssociations()    const noexcept -> Ideas const&;
+   auto GetDisassociations() const noexcept -> Ideas const&;
 
-   bool HasAssociation     (const Idea*) const;
-   bool HasDisassociation  (const Idea*) const;
+   bool HasAssociation     (Idea const*) const;
+   bool HasDisassociation  (Idea const*) const;
 
    void Associate          (Idea*);
    void Disassociate       (Idea*);
@@ -85,7 +83,7 @@ private:
    bool LinkIdea(Idea*);
    template<bool ASSOCIATE>
    void AssociateInner(Verb&);
-   auto AdvancedCompare(const Idea*, IdeaSet&) const -> const Idea*;
+   auto AdvancedCompare(Idea const*, IdeaSet&) const -> Idea const*;
    Many ExtractInner(DMeta, IdeaSet&) const;
    Many ExtractInnerInner(DMeta, Many const&) const;
    Text Self() const;
