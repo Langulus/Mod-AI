@@ -48,7 +48,7 @@ private:
    Many Compile(Many const&) const;
 
 public:
-   Mind(AI*, Neat const&);
+   Mind(AI const*, Neat const&);
 
    void Do(Verb&);
 

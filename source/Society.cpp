@@ -12,7 +12,7 @@
 /// Society construction                                                      
 ///   @param producer the AI module that produced the society                 
 ///   @param descriptor instructions for configuring the society              
-Society::Society(AI* producer, Neat const& descriptor)
+Society::Society(AI const* producer, Neat const& descriptor)
    : Downcastable {this}
    , ProducedFrom {producer, descriptor}
    , mOntology    {*this} {

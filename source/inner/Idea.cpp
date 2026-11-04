@@ -13,7 +13,7 @@
 /// Constructor                                                               
 ///   @param producer the idea producer                                       
 ///   @param data the idea's descriptor                                       
-Idea::Idea(Ontology* producer, Neat const& data)
+Idea::Idea(Ontology const* producer, Neat const& data)
    : ProducedFrom {producer, data} {
    VERBOSE_AI_BUILD("Defining idea for: ", data);
 }

@@ -29,7 +29,7 @@ private:
    TMany<Mind*> mMinds;
 
 public:
-   Society(AI*, Neat const&);
+   Society(AI const*, Neat const&);
    ~Society();
 
    void Refresh();

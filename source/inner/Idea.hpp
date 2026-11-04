@@ -45,7 +45,7 @@ protected:
    Ideas mDisassociations;
 
 public:
-   Idea(Ontology*, Neat const&);
+   Idea(Ontology const*, Neat const&);
    Idea(Idea const&) = delete;
    Idea(Idea&&) = delete;
 
