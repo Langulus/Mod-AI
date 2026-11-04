@@ -28,7 +28,7 @@ SCENARIO("Mind creation", "[ai]") {
             REQUIRE(mind.CastsTo<Things::Mind>(1));
             REQUIRE(mind.IsSparse());
 
-            REQUIRE(root.GetUnits().GetCount() == 1);
+            REQUIRE(root.GetParts().GetCount() == 1);
          }
 
       #if LANGULUS_FEATURE(MANAGED_REFLECTION)
@@ -43,7 +43,7 @@ SCENARIO("Mind creation", "[ai]") {
             REQUIRE(mind.CastsTo<Things::Mind>(1));
             REQUIRE(mind.IsSparse());
 
-            REQUIRE(root.GetUnits().GetCount() == 1);
+            REQUIRE(root.GetParts().GetCount() == 1);
          }
       #endif
 
