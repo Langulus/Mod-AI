@@ -14,7 +14,7 @@ struct Ontology {
 
 private:
    // The owning component                                              
-   const Things::AIPart& mOwner;
+   Things::AIPart const& mOwner;
 
    // The ideas                                                         
    TFactoryUnique<Idea> mIdeas;
@@ -25,14 +25,14 @@ private:
 
    size_t mLongestKnownText = 0;
 
-   Text Self() const;
+   //Text Self() const;
 
    template<class FOR>
    void OptimizeFor(Many&) const;
 
 public:
-   Ontology(const Things::AIPart&);
-   Ontology(const Things::AIPart&, Many const&);
+   Ontology(Things::AIPart const&);
+   Ontology(Things::AIPart const&, Many const&);
 
    void Create(Verb&);
    void Select(Verb&);

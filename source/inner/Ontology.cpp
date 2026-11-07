@@ -2,19 +2,19 @@
 
 
 /// Default ontology constructor                                              
-Ontology::Ontology(const Things::AIPart& c) : mOwner {c} {}
+Ontology::Ontology(Things::AIPart const& c) : mOwner {c} {}
 
 /// Ontology descriptor constructor                                           
-///   @param d - descriptor                                                   
-Ontology::Ontology(const Things::AIPart& c, Many const&) : mOwner {c} {
+///   @param d descriptor                                                     
+Ontology::Ontology(Things::AIPart const& c, Many const&) : mOwner {c} {
    TODO();
 }
 
 /// Ideas have their own hierarchy and circular references, and need to be    
 /// teared down before we're able to reset them                               
-Text Ontology::Self() const {
+/*Text Ontology::Self() const {
    return mOwner.Self();
-}
+}*/
 
 /// Ideas have their own hierarchy and circular references, and need to be    
 /// teared down before we're able to reset them                               
@@ -24,21 +24,21 @@ void Ontology::Teardown() {
 }
 
 /// Create/destroy ideas through a verb                                       
-///   @param verb - the verb                                                  
+///   @param verb the verb                                                    
 void Ontology::Create(Verb& verb) {
    mIdeas.Create(this, verb);
 }
 
 /// Select is isomorphic to create when positive                              
-///   @param verb - the verb                                                  
+///   @param verb the verb                                                    
 void Ontology::Select(Verb& verb) {
    if (verb.GetMass() > 0)
       Create(verb);
 }
 
 /// Build an idea representing a hierarchy                                    
-///   @param data - the hierarchy to represent                                
-///   @param findMetapatterns - search for all metapatterns before building   
+///   @param data the hierarchy to represent                                  
+///   @param findMetapatterns search for all metapatterns before building     
 ///      this way any previously defined complex ideas will be reused, making 
 ///      the database denser and smaller. But it costs more time...           
 ///   @return the idea representing the data                                  
@@ -64,11 +64,11 @@ auto Ontology::Build(Many const& data, bool /*findMetapatterns*/) -> Idea* {
          coalesced << &const_cast<Idea&>(idea);
       });
    }
-   else if (data.Is<Code>()) {
+   else if (data.Is<Flow::Code>()) {
       // Code needs to be normalized further by compiling it. Can't     
       // just register it as it is - spaces, cases and optional brackets
       // will produce different hashes and overcomplicate the database. 
-      data.ForEach([&](Code const& code) {
+      data.ForEach([&](Flow::Code const& code) {
          auto idea = Build(code.Parse());
          if (idea)
             coalesced << idea;
@@ -96,7 +96,7 @@ auto Ontology::Build(Many const& data, bool /*findMetapatterns*/) -> Idea* {
    }
    else {
       // Anything else gets normalized conventionally using Neat        
-      return mIdeas.CreateOne(this, data);
+      return mIdeas.Produce(this, data);
    }
    
    // Combine all the generated ideas into one and return               
@@ -117,7 +117,7 @@ auto Ontology::Build(Many const& data, bool /*findMetapatterns*/) -> Idea* {
       }*/
 
       // Build an idea from the flat idea sequence                      
-      return mIdeas.CreateOne(this, coalesced);
+      return mIdeas.Produce(this, coalesced);
    }
 
    // If reached, then no idea was built (empty data?)                  
@@ -125,7 +125,7 @@ auto Ontology::Build(Many const& data, bool /*findMetapatterns*/) -> Idea* {
 }
 
 /// Build a text pattern                                                      
-///   @param text - pattern to build idea for                                 
+///   @param text pattern to build idea for                                   
 ///   @return the idea representing the text                                  
 auto Ontology::BuildText(Text const& text) -> Idea* {
    // Keep track of the longest known text pattern                      
@@ -154,7 +154,7 @@ auto Ontology::BuildText(Text const& text) -> Idea* {
 /// concatenating them and reappending them on the front, discarding the      
 /// original from the provided data. Here's an example for text:              
 /// (text1, (text2, idea)) -> (text1+text2, idea)                             
-///   @param data - the sequence to optimize                                  
+///   @param data the sequence to optimize                                    
 template<class FOR>
 void Ontology::OptimizeFor(Many& data) const {
    if (data.IsOr())
@@ -195,7 +195,7 @@ void Ontology::OptimizeFor(Many& data) const {
 }
 
 /// Interpret some text                                                       
-///   @param text - text to interpret                                         
+///   @param text text to interpret                                           
 ///   @return the hierarchy of ideas in the text                              
 auto Ontology::Interpret(Text const& text) const -> Many {
    if (text.IsEmpty())
@@ -294,7 +294,7 @@ auto Ontology::Interpret(Text const& text) const -> Many {
 /// available in the ontology. Very useful when building ideas on top of      
 /// other ideas! When building ideas, data normalization destroys hierarchy,  
 /// and the only way to restore it is by using deeper and deeper ideas.       
-///   @param data - [in/out] the patterns to scan                             
+///   @param data [in/out] the patterns to scan                               
 ///   @return true if at least one pattern was found inside 'data'            
 /*bool Ontology::FindMetapatterns(Many& data) const {
    bool atLeastOneMetapatternFound = false;
