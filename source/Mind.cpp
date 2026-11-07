@@ -29,7 +29,7 @@ void Mind::Teardown() {
 }
 
 /// A mind records everything that happens around it.                         
-/// This happens through a custom dispatcher, a.k.a. a Do verb.               
+/// This happens through a custom dispatcher, a.k.a. Do verb.                 
 ///   @param verb the verb to log and dispatch                                
 void Mind::Do(Verb& verb) {
    //TODO some verbs require sensing organs to register, filter those here
@@ -38,7 +38,7 @@ void Mind::Do(Verb& verb) {
    if (not found)
       mHistory.Merge(mLifetime, verb);
    else
-      found.GetVal()->Insert(verb);
+      found.GetVal().Insert(verb);
 
    // Dispatch                                                          
    if (verb.template IsVerb<Verbs::Create>()
@@ -145,12 +145,12 @@ Many Mind::Compile(Many const& data) const {
       // Push ideas by extracting verbs from them                       
       // If no verbs were available, just push the idea itself - it can 
       // later by interpreted to sought data on demand                  
-      auto& ideas = reinterpret_cast<const TMany<Idea const*>&>(data);
+      auto& ideas = reinterpret_cast<TMany<Idea const*> const&>(data);
 
       if (data.IsOr()) {
          // If ideas are mutually exclusive, collect all branches and   
          // push them together into the flow                            
-         for (auto idea : ideas) {
+         for (auto* idea : ideas) {
             auto verbs = idea->Extract<Verb>();
             if (verbs)  scope <<= verbs;
             else        scope <<= idea;
@@ -159,7 +159,7 @@ Many Mind::Compile(Many const& data) const {
          if (scope.GetCount() > 1)
             scope.EnableOr();
       }
-      else for (auto idea : ideas) {
+      else for (auto* idea : ideas) {
          // Push verbs if any were available, otherwise push ideas      
          auto verbs = idea->Extract<Verb>();
          if (verbs)  scope << verbs;

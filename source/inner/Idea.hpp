@@ -85,7 +85,9 @@ private:
    void AssociateInner(Verb&);
    auto AdvancedCompare(Idea const*, IdeaSet&) const -> Idea const*;
    Many ExtractInner(DMeta, IdeaSet&) const;
-   Many ExtractInnerInner(DMeta, Many const&) const;
+   Many ExtractInnerInner(DMeta, Neat const&) const;
    Text Self() const;
    void Link(Idea*, Ideas&);
 };
+
+LANGULUS_MORPHISM(Idea, Annies::Text);

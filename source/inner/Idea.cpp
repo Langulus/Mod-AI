@@ -27,7 +27,7 @@ void Idea::Teardown() {
 /// Get the ontology interface                                                
 ///   @return the ontology that produced this idea                            
 auto Idea::GetOntology() const -> Ontology* {
-   return mProducer;
+   return const_cast<Ontology*>(mProducer);
 }
 
 /// Associate/Disassociate with a single idea                                 
@@ -70,7 +70,9 @@ void Idea::AssociateInner(Verb& verb) {
    // context-dependent way later, when using the ideas.                
    // Nothing really forces us to not allow paradoxes to exist.         
    // Our formal system has to consider them - they're part of reality  
-   // after all. Remember our motto: "if you can say it, we have to     
+   // after all: paradoxes hint at mutually exclusive hyptotheses, for  
+   // example. We must have a way to encode those after all.            
+   // Remember our motto: "if you can say it, we have to                
    // be able to represent it"... so here you are - a paradox in        
    // the context of Langulus is defined as an idea that points to      
    // conflicting associations and disassociations.                     
@@ -105,8 +107,8 @@ void Idea::Equal(Verb& verb) const {
 
    // Check if the required associations are available                  
    if (verb.IsDeep()) {
-      TODO();     // must generate a new idea and check against that
-                  // preserve hierarchy!
+      TODO();     //TODO must generate a new idea and check against that
+                  //TODO preserve hierarchy!
    }
    else verb.ForEach([&](Idea* idea) {
       if (this != idea and (not mAssociations.Contains(idea)
@@ -143,7 +145,7 @@ auto Idea::AdvancedCompare(Idea const* what, IdeaSet& mask) const
    if (mask.Contains(this))
       return nullptr;
 
-   mask << this;
+   mask <<= this;
    
    // Make sure that the idea is never found in any disassociations     
    for (auto idea : mDisassociations) {
@@ -233,7 +235,7 @@ Text Idea::Self() const {
 Idea::operator Text() const {
    if (mDescriptor.Is<Text>() and mDescriptor.GetCount() == 1) {
       // Write a more meaningful representation                         
-      auto& token = mDescriptor.Get<Text>();
+      auto& token = *mDescriptor.Get<Text>();
       bool contains_symbols = false;
       for (auto c : token) {
          if (not ::std::isalpha(c)) {
@@ -249,7 +251,7 @@ Idea::operator Text() const {
    }
 
    // Write the identity if idea is too complex                         
-   return IdentityOf("Idea", this);
+   return Text::Mention("Idea", this);
 }
 
 /// Interpret the idea as something - useful to extract specific data from    
@@ -270,20 +272,20 @@ void Idea::Interpret(Verb& verb) const {
 /// for data of specific type. The name of the game is: find if we can walk   
 /// from this idea to an instance of T, without hitting any disassociation on 
 /// the way. The hierarchy of all contained instances of T will be preserved. 
-///   @param what the data type to search for                                 
-///   @param mask a set of covered ideas to avoid infinite regresses          
+///   @param what the data type to search for (representing T)                
+///   @param mask a set of covered ideas to avoid infinite regress            
 ///   @return the extracted hierarchy of instances of T                       
 Many Idea::ExtractInner(DMeta what, IdeaSet& mask) const {
    if (mask.Contains(this))
       return {};
-   mask << this;
+   mask <<= this;
 
    // Extract the hierarchy of relevant data in the idea's descriptor   
    auto result = ExtractInnerInner(what, mDescriptor);
 
    // Make sure nothing is extracted from disassociations               
    for (auto idea : mDisassociations)
-      mask << idea;
+      mask <<= idea;
 
    // Check if any relevant data is found in any associations           
    for (auto idea : mAssociations) {
@@ -296,7 +298,7 @@ Many Idea::ExtractInner(DMeta what, IdeaSet& mask) const {
 }
 
 //TODO move this to Block::Distill?                                          
-Many Idea::ExtractInnerInner(DMeta what, Many const& data) const {
+Many Idea::ExtractInnerInner(DMeta what, Neat const& data) const {
    if (data.IsDeep()) {
       // Nest compilation. No escape from this branch                   
       Many scope;
@@ -318,5 +320,5 @@ Many Idea::ExtractInnerInner(DMeta what, Many const& data) const {
    }
 
    // Flat if reached                                                   
-   return data.CastsToMeta(what) ? data : Many {};
+   return data.CastsTo(what) ? data : Many {};
 }

@@ -1,3 +1,10 @@
+///                                                                           
+/// Langulus::Module::AI                                                      
+/// Copyright (c) 2017 Dimo Markov <team@langulus.com>                        
+/// Part of the Langulus framework, see https://langulus.com                  
+///                                                                           
+/// SPDX-License-Identifier: GPL-3.0-or-later                                 
+///                                                                           
 #include "Ontology.hpp"
 
 
@@ -9,12 +16,6 @@ Ontology::Ontology(Things::AIPart const& c) : mOwner {c} {}
 Ontology::Ontology(Things::AIPart const& c, Many const&) : mOwner {c} {
    TODO();
 }
-
-/// Ideas have their own hierarchy and circular references, and need to be    
-/// teared down before we're able to reset them                               
-/*Text Ontology::Self() const {
-   return mOwner.Self();
-}*/
 
 /// Ideas have their own hierarchy and circular references, and need to be    
 /// teared down before we're able to reset them                               
@@ -140,14 +141,14 @@ auto Ontology::BuildText(Text const& text) -> Idea* {
       // Create two ideas and associate them                            
       // We can't afford to lose the original information, but we also  
       // want to be able to find loose matches                          
-      auto i1 = mIdeas.CreateOne(this, text);
-      auto i2 = mIdeas.CreateOne(this, lower);
+      auto i1 = mIdeas.Produce(this, text);
+      auto i2 = mIdeas.Produce(this, lower);
       i1->Associate(i2);
       return i1;
    }
 
    // Text is already sanitized, just return its idea                   
-   return mIdeas.CreateOne(this, text);
+   return mIdeas.Produce(this, text);
 }
 
 /// Optimize a sequence, extracting sequential entries of the given type and  
@@ -161,9 +162,9 @@ void Ontology::OptimizeFor(Many& data) const {
       return;
 
    // Make sure FOR is concatenable (wrap it in a TMany if not)         
-   Conditional<CT::Block<FOR>, FOR, TMany<FOR>> concatenated;
+   Tif<CT::Container<FOR>, FOR, TMany<FOR>> concatenated;
 
-   data.template ForEachDeep<false, false>([&concatenated](Many& group) {
+   data.ForEachDeepNoskip([&concatenated](Many& group) {
       if (group.IsOr())
          return Loop::Break;     // Abort on groups that branch         
       else if (group.IsDeep())
@@ -203,7 +204,7 @@ auto Ontology::Interpret(Text const& text) const -> Many {
 
    // Is the text available in the cache? Directly return it if so      
    VERBOSE_AI_INTERPRET_TAB("Interpreting: ", text);
-   const auto cached = mCache.FindIt(text);
+   const auto cached = mCache.Find(text);
    if (cached) {
       VERBOSE_AI_INTERPRET("Cached: ", cached.GetVal());
       return cached.GetVal();
@@ -262,11 +263,11 @@ auto Ontology::Interpret(Text const& text) const -> Many {
       // Cache and merge the interpretation                             
       VERBOSE_AI_INTERPRET("Final (previous): ", text, " -> ", result);
       VERBOSE_AI_INTERPRET("Final (optimized): ", text, " -> ", pattern);
-      mCache.Insert(text, pattern);
+      mCache.Merge(text, pattern);
       
       // Avoid duplication                                              
       bool found = false;
-      result.ForEachDeep<false, false>([&](Many const& group) {
+      result.ForEachDeepNoskip([&](Many const& group) {
          if (group == pattern) {
             found = true;
             return Loop::Break;

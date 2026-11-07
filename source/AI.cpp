@@ -7,6 +7,7 @@
 ///                                                                           
 #include "AI.hpp"
 #include <Langulus/Event.hpp>
+#include <Langulus/Math/Export.hpp>
 #include <Langulus/Math/Color.hpp>
 #include <Langulus/Math/Range.hpp>
 #include <Langulus/Math/Number.hpp>
