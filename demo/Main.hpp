@@ -8,6 +8,7 @@
 #include <Langulus/Thing.hpp>
 
 using namespace Langulus;
+using Things::Thing;
 
 
 void BuildOntology(Thing&);

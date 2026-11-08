@@ -13,8 +13,6 @@
 
 using namespace Langulus;
 
-LANGULUS_RTTI_BOUNDARY(RTTI::MainBoundary)
-
 
 int main(int, char**) {
    Logger::ToHTML logFile {"ai-demo.htm"};
@@ -25,7 +23,7 @@ int main(int, char**) {
 
    // Create the mind and build a common ontology for all demos         
    // Let's prove how scalable this strategy really is ;)               
-   auto mind = root.CreateUnit<Things::Mind>();
+   auto mind = root.CreatePart<Things::Mind>();
    BuildOntology(root);
 
    // Pick a demo                                                       

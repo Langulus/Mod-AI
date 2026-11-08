@@ -16,7 +16,7 @@ SCENARIO("Idea creation", "[ai]") {
       GIVEN(std::string("Init and shutdown cycle #") + std::to_string(repeat)) {
          // Create root entity                                          
          auto root = Thing::Root("AI");
-         auto mind = root.CreateUnit<Things::Mind>();
+         auto mind = root.CreatePart<Things::Mind>();
 
          WHEN("An Idea was created") {
             auto idea = root.Run("? create Idea(`one`)");
@@ -47,7 +47,7 @@ SCENARIO("Associating ideas", "[ai]") {
 
    GIVEN("Some explicitly created ideas") {
       auto root = Thing::Root("AI");
-      auto mind = root.CreateUnit<Things::Mind>();
+      auto mind = root.CreatePart<Things::Mind>();
 
       auto idea_one    = root.Run("thing? create Idea(`one`)");
       auto idea_1      = root.Run("thing? create Idea(1)");
@@ -103,7 +103,7 @@ SCENARIO("Associating ideas", "[ai]") {
 
    GIVEN("Some implicitly created ideas") {
       auto root = Thing::Root("AI");
-      auto mind = root.CreateUnit<Things::Mind>();
+      auto mind = root.CreatePart<Things::Mind>();
 
       auto idea_one    = root.Run("##one");
       auto idea_1      = root.Run("##(1)");

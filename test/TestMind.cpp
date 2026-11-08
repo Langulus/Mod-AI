@@ -18,7 +18,7 @@ SCENARIO("Mind creation", "[ai]") {
          auto root = Thing::Root<false>("AI");
 
          WHEN("The mind is created via abstraction") {
-            auto mind = root.CreateUnit<Things::Mind>();
+            auto mind = root.CreatePart<Things::Mind>();
 
             // Update once                                              
             root.Update({});
