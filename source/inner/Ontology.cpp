@@ -221,13 +221,13 @@ auto Ontology::Interpret(Text const& text) const -> Many {
       
       // Figure out the pattern                                         
       if (token == lower) {
-         auto idea = mIdeas.Find(token);
+         auto idea = mIdeas.Find(token).Get();
          if (idea)
             pattern = idea;
       }
       else {
-         auto idea1 = mIdeas.Find(token);
-         auto idea2 = mIdeas.Find(lower);
+         auto idea1 = mIdeas.Find(token).Get();
+         auto idea2 = mIdeas.Find(lower).Get();
          if (idea1 and idea2) {
             pattern << idea1 << idea2;
             pattern.EnableOr();
