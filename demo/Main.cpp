@@ -6,8 +6,9 @@
 /// SPDX-License-Identifier: GPL-3.0-or-later                                 
 ///                                                                           
 #include "Main.hpp"
-#include <Langulus/Time.hpp>
+#include <Langulus/Framerate.hpp>
 #include <Langulus/CppAPI/AI.hpp>
+#include <Langulus/Logger/HTML.hpp>
 #include <thread>
 #include <iostream>
 
