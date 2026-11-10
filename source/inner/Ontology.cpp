@@ -13,7 +13,7 @@ Ontology::Ontology(Things::AIPart const& c) : mOwner {c} {}
 
 /// Ontology descriptor constructor                                           
 ///   @param d descriptor                                                     
-Ontology::Ontology(Things::AIPart const& c, Many const&) : mOwner {c} {
+Ontology::Ontology(Things::AIPart const& c, Neat const&) : mOwner {c} {
    TODO();
 }
 
@@ -43,7 +43,7 @@ void Ontology::Select(Verb& verb) {
 ///      this way any previously defined complex ideas will be reused, making 
 ///      the database denser and smaller. But it costs more time...           
 ///   @return the idea representing the data                                  
-auto Ontology::Build(Many const& data, bool /*findMetapatterns*/) -> Idea* {
+auto Ontology::Build(Neat const& data, bool /*findMetapatterns*/) -> Idea* {
    // Clear the cache every time we build a new pattern                 
    mCache.Clear();
 
@@ -54,7 +54,8 @@ auto Ontology::Build(Many const& data, bool /*findMetapatterns*/) -> Idea* {
    if (data.IsDeep()) {
       // Represent each group as an idea                                
       data.ForEach([&](Many const& group) {
-         auto idea = Build(group);
+         Neat tidy {group};
+         auto idea = Build(tidy);
          if (idea)
             coalesced << idea;
       });
@@ -70,7 +71,8 @@ auto Ontology::Build(Many const& data, bool /*findMetapatterns*/) -> Idea* {
       // just register it as it is - spaces, cases and optional brackets
       // will produce different hashes and overcomplicate the database. 
       data.ForEach([&](Flow::Code const& code) {
-         auto idea = Build(code.Parse());
+         Neat tidy {code.Parse()};
+         auto idea = Build(tidy);
          if (idea)
             coalesced << idea;
       });
@@ -118,7 +120,8 @@ auto Ontology::Build(Many const& data, bool /*findMetapatterns*/) -> Idea* {
       }*/
 
       // Build an idea from the flat idea sequence                      
-      return mIdeas.Produce(this, coalesced);
+      Neat tidy {Abandon {coalesced}};
+      return mIdeas.Produce(this, tidy);
    }
 
    // If reached, then no idea was built (empty data?)                  
@@ -141,14 +144,14 @@ auto Ontology::BuildText(Text const& text) -> Idea* {
       // Create two ideas and associate them                            
       // We can't afford to lose the original information, but we also  
       // want to be able to find loose matches                          
-      auto i1 = mIdeas.Produce(this, text);
-      auto i2 = mIdeas.Produce(this, lower);
+      auto i1 = mIdeas.Produce(this, Neat {text} );
+      auto i2 = mIdeas.Produce(this, Neat {lower});
       i1->Associate(i2);
       return i1;
    }
 
    // Text is already sanitized, just return its idea                   
-   return mIdeas.Produce(this, text);
+   return mIdeas.Produce(this, Neat {text});
 }
 
 /// Optimize a sequence, extracting sequential entries of the given type and  
@@ -182,7 +185,8 @@ void Ontology::OptimizeFor(Many& data) const {
 
    if constexpr (CT::Text<FOR>) {
       // Interpret the concatenated text again                          
-      auto idea = mIdeas.Find(concatenated);
+      Neat tidy {concatenated};
+      auto idea = mIdeas.FindByDescription(tidy);
       if (idea) {
          data >> idea;
          return;
@@ -217,17 +221,19 @@ auto Ontology::Interpret(Text const& text) const -> Many {
    for (size_t i = 1; i <= text.GetCount(); ++i) {
       Many pattern;
       Text token = text.Select(0, i);
-      auto lower = token.Lowercase();
+      Text lower = token.Lowercase();
       
       // Figure out the pattern                                         
+      Neat tidy_token {token};
       if (token == lower) {
-         auto idea = mIdeas.Find(token).Get();
+         auto idea = mIdeas.FindByDescription(tidy_token);
          if (idea)
             pattern = idea;
       }
       else {
-         auto idea1 = mIdeas.Find(token).Get();
-         auto idea2 = mIdeas.Find(lower).Get();
+         Neat tidy_lower {lower};
+         auto idea1 = mIdeas.FindByDescription(tidy_token);
+         auto idea2 = mIdeas.FindByDescription(tidy_lower);
          if (idea1 and idea2) {
             pattern << idea1 << idea2;
             pattern.EnableOr();
@@ -257,7 +263,8 @@ auto Ontology::Interpret(Text const& text) const -> Many {
 
          OptimizeFor<Text>(pattern);
          OptimizeFor<Idea*>(pattern);
-         pattern.Optimize(); //TODO remove this when auto-optimization starts to happen properly on Loop::Discard
+         //pattern.Optimize(); //TODO remove this when auto-optimization starts to happen properly on Loop::Discard
+         //TODO temporarily disabled to see how Neat-based ideas handle it
       }
 
       // Cache and merge the interpretation                             

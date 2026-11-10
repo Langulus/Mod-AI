@@ -85,7 +85,8 @@ private:
    void AssociateInner(Verb&);
    auto AdvancedCompare(Idea const*, IdeaSet&) const -> Idea const*;
    Many ExtractInner(DMeta, IdeaSet&) const;
-   Many ExtractInnerInner(DMeta, Neat const&) const;
+   template<class T>
+   Many ExtractInnerInner(DMeta, T const&) const;
    Text Self() const;
    void Link(Idea*, Ideas&);
 };

@@ -79,7 +79,8 @@ void Idea::AssociateInner(Verb& verb) {
 
    // Build an idea representing the argument, and (dis)associate       
    // with it instead                                                   
-   auto idea = GetOntology()->Build(verb.GetRHS());
+   Neat tidy {verb.GetRHS()};
+   auto idea = GetOntology()->Build(tidy);
    if (LinkIdea<ASSOCIATE>(idea))
       verb << this;
 }
@@ -268,6 +269,36 @@ void Idea::Interpret(Verb& verb) const {
    });
 }
 
+//TODO move this to Block::Distill?                                          
+template<class T>
+Many Idea::ExtractInnerInner(DMeta what, T const& data) const {
+   if (data.IsDeep()) {
+      // Nest compilation. No escape from this branch                   
+      Many scope;
+      if (data.IsOr()) {
+         data.ForEach([&](Many const& group) {
+            scope <<= ExtractInnerInner(what, group);
+         });
+
+         if (scope.GetCount() > 1)
+            scope.EnableOr();
+      }
+      else {
+         data.ForEach([&](Many const& group) {
+            scope << ExtractInnerInner(what, group);
+         });
+      }
+
+      return scope;
+   }
+
+   // Flat if reached                                                   
+   if constexpr (CT::Neat<T>)
+      return data.CastsTo(what) ? data.template As<Many>() : Many {};
+   else
+      return data.CastsTo(what) ? data : Many {};
+}
+
 /// Iterates through all nested associations and disassociations in search    
 /// for data of specific type. The name of the game is: find if we can walk   
 /// from this idea to an instance of T, without hitting any disassociation on 
@@ -295,30 +326,4 @@ Many Idea::ExtractInner(DMeta what, IdeaSet& mask) const {
    }
 
    return result;
-}
-
-//TODO move this to Block::Distill?                                          
-Many Idea::ExtractInnerInner(DMeta what, Neat const& data) const {
-   if (data.IsDeep()) {
-      // Nest compilation. No escape from this branch                   
-      Many scope;
-      if (data.IsOr()) {
-         data.ForEach([&](Many const& group) {
-            scope <<= ExtractInnerInner(what, group);
-         });
-
-         if (scope.GetCount() > 1)
-            scope.EnableOr();
-      }
-      else {
-         data.ForEach([&](Many const& group) {
-            scope << ExtractInnerInner(what, group);
-         });
-      }
-
-      return scope;
-   }
-
-   // Flat if reached                                                   
-   return data.CastsTo(what) ? data : Many {};
 }

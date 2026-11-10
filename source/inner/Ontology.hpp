@@ -15,13 +15,12 @@
 
 ///                                                                           
 ///   An ontology                                                             
-///                                                                           
 struct Ontology {
    using CTTI_Ability = Types<Verbs::Create, Verbs::Select>;
 
 private:
    // The owning component                                              
-   Things::AIPart const& mOwner;
+   [[maybe_unused]] Things::AIPart const& mOwner;
 
    // The ideas                                                         
    TFactoryUnique<Idea> mIdeas;
@@ -39,12 +38,12 @@ private:
 
 public:
    Ontology(Things::AIPart const&);
-   Ontology(Things::AIPart const&, Many const&);
+   Ontology(Things::AIPart const&, Neat const&);
 
    void Create(Verb&);
    void Select(Verb&);
 
-   auto Build(Many const&, bool findMetapatterns = true) -> Idea*;
+   auto Build(Neat const&, bool findMetapatterns = true) -> Idea*;
    auto BuildText(Text const&) -> Idea*;
    auto Interpret(Text const&) const -> Many;
    //bool FindMetapatterns(Many&) const;
