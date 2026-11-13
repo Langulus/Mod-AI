@@ -7,13 +7,17 @@
 ///                                                                           
 #include <Langulus/CppAPI/AI.hpp>
 #include <Langulus/Testing.hpp>
+#include <Langulus/Allocator.hpp>
+
+using namespace Langulus;
+using Things::Thing;
 
 
-SCENARIO("Idea creation", "[ai]") {
-   static Allocator::State memoryState;
+SCENARIO("Idea creation") {
+   static MemoryState memoryState;
    
-   for (int repeat = 0; repeat != 10; ++repeat) {
-      GIVEN(std::string("Init and shutdown cycle #") + std::to_string(repeat)) {
+   GIVEN("Init and shutdown cycles") {
+      for (int repeat = 0; repeat != 10; ++repeat) {
          // Create root entity                                          
          auto root = Thing::Root("AI");
          auto mind = root.CreatePart<Things::Mind>();
@@ -26,7 +30,7 @@ SCENARIO("Idea creation", "[ai]") {
             root.DumpHierarchy();
 
             REQUIRE(idea.GetCount() == 1);
-            REQUIRE(idea.GetType()->mToken == "Idea*");
+            REQUIRE(idea.GetType().GetName() == "Idea*");
             REQUIRE(idea.IsSparse());
 
             THEN("An Idea was associated") {
@@ -36,14 +40,14 @@ SCENARIO("Idea creation", "[ai]") {
             }
          }
 
-         // Check for memory leaks after each cycle                     
          REQUIRE(memoryState.Assert());
+         REQUIRE_FALSE(Allocator::CollectGarbage());
       }
    }
 }
 
-SCENARIO("Associating ideas", "[ai]") {
-   Allocator::State memoryState;
+SCENARIO("Associating ideas") {
+   static MemoryState memoryState;
 
    GIVEN("Some explicitly created ideas") {
       auto root = Thing::Root("AI");
@@ -148,7 +152,7 @@ SCENARIO("Associating ideas", "[ai]") {
       }
    }
 
-   // Check for memory leaks after each cycle                           
    REQUIRE(memoryState.Assert());
+   REQUIRE_FALSE(Allocator::CollectGarbage());
 }
 
