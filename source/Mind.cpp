@@ -34,11 +34,12 @@ void Mind::Teardown() {
 void Mind::Do(Verb& verb) {
    //TODO some verbs require sensing organs to register, filter those here
    // Record history                                                    
-   auto found = mHistory.Find(mLifetime);
+   mHistory[mLifetime] << verb;
+   /*auto found = mHistory.Find(mLifetime);
    if (not found)
       mHistory.Merge(mLifetime, verb);
    else
-      found.GetVal().Insert(verb);
+      found.GetVal().Insert(verb);*/
 
    // Dispatch                                                          
    if (verb.template IsVerb<Verbs::Create>()
